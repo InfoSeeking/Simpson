@@ -1,0 +1,474 @@
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Myriad Pro Bold";
+	color: #5b5b5b;
+}
+
+.navbar-fixed {
+	background: #9ac3ff;
+	font-family: 'Myriad Pro Regular';
+	font-size: 12pt;
+	text-transform: uppercase;
+}
+
+.navbar-brand {
+	height: auto;
+}
+
+.navbar-header {
+	width: 100%;
+}
+
+.navbar-header .profile {
+	float: right;
+	margin-top: 5px;
+	margin-right: 5px;
+}
+
+.navbar-header .profile img {
+	width: 60px;
+	border-radius: 30px;
+	border: 3px #599bb4 solid;
+}
+
+#subnav {
+	background: #599bb4;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	color: #FFF;
+}
+
+#subnav a {
+	color: #FFF;
+	padding-right: 12px;
+}
+.sidebar {
+	padding-left: 0px;
+
+}
+.sidebar ul {
+	list-style-type: none;
+	padding-left: 0px;
+}
+
+.sidebar ul li {
+	padding-left: 0px;
+}
+
+.sidebar a {
+	color: #808080;
+	font-family: 'Myriad Pro Bold';
+	font-size: 12pt;
+	position: relative;
+	display: block;
+	padding-left: 15px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.sidebar a span {
+	padding-right: 5px;
+}
+
+.sidebar a:hover,
+.page-new-project .link-new-project,
+.page-my-projects .link-my-projects,
+.page-shared-projects .link-shared-projects,
+.page-chat .link-chat,
+.page-snippets .link-snippets,
+.page-bookmarks .link-bookmarks,
+.page-activity .link-activity,
+.page-docs .link-docs,
+.page-view .link-view,
+.page-settings .link-settings,
+.page-user-settings .link-user-settings {
+	color: #ffa15c;
+}
+
+.sidebar a .highlight {
+	background: #ffa15c;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 10px;
+	height: 100%;
+	display: none;
+}
+.sidebar a:hover .highlight,
+.page-new-project .link-new-project .highlight,
+.page-my-projects .link-my-projects .highlight,
+.page-shared-projects .link-shared-projects .highlight{
+	display: block;
+}
+
+#body-container {
+	min-height: 200px;
+	background: #F3F3F3;
+}
+
+.main-content {
+	background: #FFF;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	min-height: 300px;
+	color: #5b5b5b;
+
+}
+
+.main-content p {
+	color: #5b5b5b;
+}
+
+#project-list {
+	list-style-type: none;
+	padding-left: 0px;
+}
+
+#project-list li {
+	border-bottom: 1px #969797 solid;
+	color: #5b5b5b;
+	background: #F5F5F5;
+	padding: 1px 10px;
+}
+
+#project-list li:last-child {
+	border-bottom: none;
+}
+
+#project-list li h4 {
+	position: relative;
+}
+
+#project-list li h4 small {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+}
+
+
+.create-form label{
+	color: #5b5b5b;
+	font-family: 'Myriad Pro Bold';
+	font-size: 12pt;
+	text-transform: uppercase;
+}
+
+.create-form small, .create-form p {
+	color: #5b5b5b;
+	font-family: 'Myriad Pro Regular';
+	font-size: 10pt;
+}
+
+footer {
+	background: #5b5b5b;
+	color: #dbdbdb;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#bookmark_list {
+	list-style-type: none;
+	padding-left: 0px;
+}
+
+#new {
+	display: none;
+	margin-bottom: 20px;
+}
+
+.context {
+	padding: 0px 15px;
+}
+
+.thumbnail {
+	background: #FFF;
+}
+
+
+#chat-list {
+	list-style-type: none;
+	background: #f3f3f3;
+	padding: 10px 10px 50px 10px;
+	border: 1px #DDD solid;
+	overflow: auto;
+	height: 300px;
+	position: relative;
+}
+
+#chat-list li {
+	position: relative;
+}
+
+@-webkit-keyframes enterin {
+  from {
+    background: #DDD;
+  }
+
+  to {
+    background: #FFF;
+  }
+}
+
+@keyframes enterin {
+  from {
+    background: #DDD;
+  }
+
+  to {
+    background: #FFF;
+  }
+}
+
+#chat-list li {
+	border-bottom: 1px #DDD dashed;
+	margin-bottom: 5px;
+}
+
+#chat-list li:last-child {
+	border-bottom: none;
+}
+
+#chat-list li.new {
+	-webkit-animation-duration: 1s;
+	        animation-duration: 1s;
+  	-webkit-animation-name: enterin;
+  	        animation-name: enterin;
+}
+
+#chat-list li .name {
+	color: #599BB4;
+	font-size: 11px;
+	margin-bottom: 2px;
+}
+
+#chat-list li .time {
+	font-size: 11px;
+}
+
+.data-view .list {
+	margin-left: 20px;
+}
+
+.data-view .empty-message {
+	padding: 5px 15px;
+}
+
+.data-view .grid {
+	width: 210px;
+	height: 210px;
+	margin: 20px;
+	float: left;
+	position: relative;
+	overflow: hidden;
+}
+
+.data-view .overlay {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;	
+	background: rgba(200,200,200,.8);	
+}
+
+.data-view .grid .overlay {
+	height: 0px;
+	transition: height .5s;
+}
+
+.data-view .grid:hover .overlay {
+	height: 30%;
+}
+
+.data-view .grid .overlay .top {
+	position: absolute;
+	top: -20px;
+	width: 100%;
+	background: rgba(200,200,200,.8);
+}
+.data-view .grid .overlay .bottom {
+	margin-top: 0px;
+	font-size: 12px;
+	padding: 0px 5px;
+}
+
+.data-view .grid .overlay .bottom p {
+	margin: 0px;
+}
+
+.data-view .overlay .link {
+	color: #4d4d4d;
+	font-size: 10px;
+	margin-left: 5px;
+}
+
+.data-view .overlay .right {
+	position: absolute;
+	right: 5px;
+	top: 0px;
+}
+
+#coverflow-container {
+	min-height: 600px;
+}
+
+.data-view .coverflow img {
+	width: 500px;
+}
+
+.data-view .coverflow {
+	background: #FFF;
+	border: 2px #F3F3F3 solid;
+}
+
+.data-view .coverflow .overlay .link {
+	font-size: 14px;
+}
+
+#impress {
+	perspective: 1000px;
+	-webkit-perspective: 1000px;
+	-moz-perspective: 1000px;
+	position: absolute;
+	top: 50px;
+	left: 200px;
+}
+
+.data-view[data-layout="three-d"] {
+	perspective: 1000px;
+	-webkit-perspective: 1000px;
+	-moz-perspective: 1000px;
+	margin-top: 50px;
+	margin-left: 50px;
+	height: 500px;
+}
+
+.data-view .three-d {
+	background: rgba(255,255,255,1);
+	border: 2px #2d2d2d solid;
+	width: 404px;
+	height: 404px;
+	position: absolute;
+	transition: -webkit-transform .25s ease-out;
+	transition: transform .25s ease-out;
+	transition: transform .25s ease-out, -webkit-transform .25s ease-out;
+}
+
+.data-view .three-d img {
+	height: 400px;
+}
+
+.data-view[data-layout=list] {
+	margin-top: 10px;
+	margin-right: 10px;
+}
+
+.data-view[data-layout=list] .list {
+	border-bottom: 1px #efefef solid;
+	margin-bottom: 10px;
+}
+
+.data-view[data-layout=list] .list:last-child {
+	border-bottom: none;
+	margin-bottom: 10px;
+}
+
+.page-list-container {
+	border-right: 2px #efefef solid;
+}
+
+.profile-image {
+	width: 100px;
+	border: 1px #333 solid;
+}
+
+.panel .column {
+	padding: 0px;
+}
+.panel .pane {
+	float: left;
+	display: block;
+	margin: 0px;
+	width: 100%;
+	background: #F00;
+	text-align: center;
+	padding: 5%;
+	color: #FFF;
+	font-size: 18px;
+	transition: -webkit-filter .25s linear;
+	transition: filter .25s linear;
+	transition: filter .25s linear, -webkit-filter .25s linear;
+}
+.panel .projects {
+	width: 100%;
+	background: #599bb4;
+}
+
+.panel .user-settings {
+	width: 50%;
+	background: #65B0CC;
+}
+
+.panel .shared-projects {
+	width: 50%;
+	background: #3458B4;
+}
+
+.panel .explore-projects {
+	width: 50%;
+	background: #65787F;
+}
+
+.panel .new-project {
+	width: 50%;
+	background: #1D397F;	
+}
+
+.panel a {
+	color: #FFF;
+	display: block;
+}
+
+.panel a:hover .pane{
+	-webkit-filter: brightness(1.1);
+	filter: brightness(1.1);
+}
+
+.page-panel #body-container {
+	background: #FFF;
+}
+
+.stats {
+	padding: 10px 15px;
+	color: #808080;
+}
+
+.stats .tag {
+	display: inline-block;
+	width: 80px;
+}
+
+.page-panel .action-button:hover {
+	background: #9AC3FF;
+}
+
+.page-panel .action-button span {
+	margin-right: 5px;
+}
+.page-panel .action-button {
+	display: block;
+	padding: 5px 20px;
+	background: #EEE;
+	margin-bottom: 5px;
+	text-decoration: none;
+	position: relative;
+}
+
+.page-panel .action-button h5 {
+	font-size: 18px;
+}
+
+.page-panel .action-button .right-arrow {
+	font-size: 50px;
+	position: absolute;
+	right: 10px;
+	top: 0px;
+	color: #EEE;
+}
