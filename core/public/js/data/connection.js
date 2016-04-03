@@ -7,6 +7,12 @@ var ConnectionModel = Backbone.Model.extend({
 
 		var recipient = userList.get(this.get('recipient_id'));
 		this.set('recipient_name', recipient.get('name'));
+
+		if (this.get('initiator_id') == Config.get('userId')) {
+			this.set('other_name', recipient.get('name'));
+		} else if (this.get('recipient_id') == Config.get('userId')) {
+			this.set('other_name', initiator.get('name'));
+		}
 	},
 	onError: function(model, response) {
 		MessageDisplay.displayIfError(response.responseJSON);
@@ -14,7 +20,7 @@ var ConnectionModel = Backbone.Model.extend({
 });
 
 var ConnectionCollection = Backbone.Collection.extend({
-	model: RequestModel,
+	model: ConnectionModel,
 	url: '/api/v1/connections',
 	initialize: function() {
 		this.on('error', this.onError, this);
@@ -27,13 +33,13 @@ var ConnectionCollection = Backbone.Collection.extend({
 	}
 });
 
-var ConnectionItemView = Backbone.View.extend({
+var ConnectionListItemView = Backbone.View.extend({
 	tagName: 'div',
-	className: 'request',
+	className: 'connection',
 	events: {
 		'click .delete': 'onDelete',
 	},
-	template: _.template($('[data-template=request]').html()),
+	template: _.template($('[data-template=user_connection]').html()),
 	attributes: function() {
 		return {
 			'data-id': this.model.id
@@ -46,36 +52,39 @@ var ConnectionItemView = Backbone.View.extend({
 	},
 	onDelete: function(e) {
 		e.preventDefault();
-		var modalEl = $('#delete-request-modal');
-		modalEl.find('[name=incoming_request_id]').val(this.model.get('id'));
+		var modalEl = $('#delete-connection-modal');
+		modalEl.find('[name=connection_id]').val(this.model.get('id'));
 		modalEl.modal('show');
 	},
 	render: function() {
 		var html = this.template(this.model.toJSON());
-		this.$el.html(html).addClass(this.model.get('direction') + '-request');
+		this.$el.html(html).addClass('user-connection');
 		return this;
 	},
 });
 
 // Only shows connections with current user.
 var ConnectionListView = Backbone.View.extend({
-	el: '#incoming-request-list',
+	el: '#user-connection-list',
 	initialize: function(options) {
 		this.collection.on('add', this.add, this);
 	},
 	render: function() {
+		var that = this;
 		this.$el.empty();
 		this.collection.forEach(function(model){
 			that.add(model);
 		});
 	},
 	add: function(model) {
+		console.log('adding', model);
 		// Filter only user connections.
 		if (model.get('initiator_id') != Config.get('userId') &&
 			model.get('recipient_id') != Config.get('userId')) {
+			console.log('ignoring');
 			return;
 		}
-		var item = new RequestListItemView({model: model});
+		var item = new ConnectionListItemView({model: model});
 		item.render();
 		this.$el.append(item.$el);
 		var that = this;
@@ -86,7 +95,7 @@ var ConnectionListView = Backbone.View.extend({
 });
 
 var ConnectionGraphView = Backbone.View.extend({
-	el: '#incoming-request-list',
+	el: '#connection-graph',
 	initialize: function(options) {
 		this.collection.on('add', this.add, this);
 	},
@@ -97,7 +106,7 @@ var ConnectionGraphView = Backbone.View.extend({
 		});
 	},
 	add: function(model) {
-		var item = new RequestListItemView({model: model});
+		var item = new ConnectionListItemView({model: model});
 		item.render();
 		this.$el.append(item.$el);
 		var that = this;
@@ -106,26 +115,3 @@ var ConnectionGraphView = Backbone.View.extend({
 		});
 	}
 });
-
-// This function will initialize event handlers for the request forms.
-// The collection is updated when a request is created/updated/deleted.
-// This way, the collection could be a RequestCollection or any other 
-// collection. (e.g. a feed list containing multiple types of objects).
-//
-function initializeRequestFormEventHandlers(collection){
-	if (!collection) throw 'Collection not passed';
-	$('#create-request').on('submit', onCreateSubmit);
-	$('#delete-request').on('submit', onDeleteSubmit);
-
-	function onDeleteSubmit(e) {
-		e.preventDefault();
-		$('#delete-request-modal').modal('hide');
-		var incoming_request_id = $(this).find('[name=incoming_request_id]').val();
-		var incoming_request = collection.get(incoming_request_id);
-		if (!incoming_request) {
-			MessageDisplay.display(['Could not delete incoming request'], 'danger');
-			return;
-		}
-		incoming_request.destroy();
-	}
-}

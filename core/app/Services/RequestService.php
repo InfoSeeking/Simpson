@@ -172,7 +172,7 @@ class RequestService {
 
 		if ($args['state'] == 'accepted') {
 			$connectionStatus = $this->connectionService->create([
-				'initiator_id' => $this->user->id,
+				'initiator_id' => $request->initiator_id,
 				'recipient_id' => $request->recipient_id,
 				// 'intermediary_id' => $request->intermediary_id, Will this spoil the validator?
 				'project_id' => $request->project_id

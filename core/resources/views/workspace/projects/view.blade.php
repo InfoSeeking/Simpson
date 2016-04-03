@@ -41,7 +41,7 @@ page-view
 <ul id='incoming-request-list'></ul>
 
 <h4>Users Connected to You</h4>
-<ul id='user-connected-list'>
+<ul id='user-connection-list'>
 </ul>
 
 <script type='text/template' data-template='request'>
@@ -61,6 +61,10 @@ They accepted.
 <% else if (state == 'rejected') %>
 They rejected.
 <% } %>
+</script>
+
+<script type='text/template' data-template='user_connection'>
+You are connected to <%= other_name %>.
 </script>
 
 <script src='/js/realtime.js'></script>
@@ -97,7 +101,10 @@ userList.add(new UserModel(
 ));
 @endforeach
 
-var connectionList = new ConnectionCollection();
+var connectionList = new ConnectionCollection({!! $connections->toJSON() !!});
+var connectionListView = new ConnectionListView({ collection: connectionList });
+connectionListView.render();
+// var connectionGraphView = new ConnectionGraphView({ collection: connectionList });
 
 function realtimeDataHandler(param) {
 	console.log(param);

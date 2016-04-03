@@ -6,7 +6,6 @@ use Auth;
 use Validator;
 
 use App\Models\Connection;
-use App\Models\Request;
 use App\Models\Membership;
 use App\Models\User;
 use App\Services\MembershipService;
@@ -34,8 +33,8 @@ class ConnectionService {
 		
 		$memberStatus = $this->memberService->checkPermission($args['project_id'], 'r', $this->user);
 		if (!$memberStatus->isOK()) return Status::fromStatus($memberStatus);
-		$requests = Request::where('project_id', $args['project_id']);
-		return Status::fromResult($requests->get());
+		$connections = Connection::where('project_id', $args['project_id']);
+		return Status::fromResult($connections->get());
 	}
 	
 	// if initiator_id is not passed, current user is assumed.
@@ -57,10 +56,8 @@ class ConnectionService {
 		}
 		
 		// Ensure a connection does not already exist.
-		$query = Connection::where('initiator_id', $idA)
-			->orWhere('recipient_id', $idA)
-			->where('initiator_id', $idB)
-			->orWhere('recipient_id', $idB)
+		$query = Connection::whereIn('initiator_id', [$idA, $idB])
+			->whereIn('recipient_id', [$idA, $idB])
 			->where('project_id', $args['project_id']);
 
 		if (array_key_exists('intermediary_id', $args)) {

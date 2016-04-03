@@ -99,6 +99,7 @@ var IncomingRequestListView = Backbone.View.extend({
 	},
 	render: function() {
 		this.$el.empty();
+		var that = this;
 		this.collection.forEach(function(model){
 			that.add(model);
 		});
