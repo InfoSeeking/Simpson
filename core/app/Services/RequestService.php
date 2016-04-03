@@ -106,6 +106,10 @@ class RequestService {
 		$request->state = 'open';
 		$request->save();
 
+		if ($request->initiator_id == $request->recipient_id) {
+			return Status::fromError('Cannot send request to self');
+		}
+
 		// TODO: handle scoring.
 
 		if ($request->type == 'answer') {

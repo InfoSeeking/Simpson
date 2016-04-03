@@ -19,30 +19,40 @@ page-view
 
 @section('main-content')
 
-@include('helpers.showAllMessages')
+<div class='row'>
+<div class='col-md-6'>
+	@include('helpers.showAllMessages')
+	
+	<div id='graph-display'></div>
+	<div id='selected-user'>
+		<p>Currently selecting <span class='name'></span>. <a href='#' class='request-connection' data-id=''>Request connection</a>
+	</div>
+	
+	<h4>All users</h4>
+	<ul id='all-user-list'>
+	@foreach ($sharedUsers as $sharedUser)
+	<li data-id={{$sharedUser->user->id}}>
+	{{$sharedUser->user->name}}
+	<a href='#' class='request-connection' style='display:none' data-id='{{ $sharedUser->user->id }}'>Request connection</a></li>
+	@endforeach
+	</ul>
+</div>
+<div class='col-md-6'>
+	<p>Welcome to your study project.</p>
+	<h4>Questions</h4>
+	<h5>You have Answered (TODO)</h5>
+	<h5>You need to Answer (TODO)</h5>
 
-<p>Welcome to your study project.</p>
+	<h4>Outgoing Connection Requests</h4>
+	<ul id='outgoing-request-list'></ul>
 
-<h4>Questions</h4>
-<h5>You have Answered</h5>
-<h5>You need to Answer</h5>
-<h4>Available Users</h4>
-<small>To be replaced with a graph interface</small>
-<ul>
-@foreach ($sharedUsers as $sharedUser)
-<li>{{$sharedUser->user->name}} <a href='#' class='request-connection' data-id='{{ $sharedUser->user->id }}'>Request connection</a></li>
-@endforeach
-</ul>
+	<h4>Incoming Connection Requests</h4>
+	<ul id='incoming-request-list'></ul>
 
-<h4>Outgoing Connection Requests</h4>
-<ul id='outgoing-request-list'></ul>
-
-<h4>Incoming Connection Requests</h4>
-<ul id='incoming-request-list'></ul>
-
-<h4>Users Connected to You</h4>
-<ul id='user-connection-list'>
-</ul>
+	<h4>Users Connected to You</h4>
+	<ul id='user-connection-list'>
+	</ul>
+</div>
 
 <script type='text/template' data-template='request'>
 <% if (direction == 'incoming') { %>
@@ -104,7 +114,9 @@ userList.add(new UserModel(
 var connectionList = new ConnectionCollection({!! $connections->toJSON() !!});
 var connectionListView = new ConnectionListView({ collection: connectionList });
 connectionListView.render();
-// var connectionGraphView = new ConnectionGraphView({ collection: connectionList });
+
+var connectionGraphView = new ConnectionGraphView({ collection: connectionList });
+connectionGraphView.render();
 
 function realtimeDataHandler(param) {
 	console.log(param);

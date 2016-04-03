@@ -472,3 +472,11 @@ footer {
 	top: 0px;
 	color: #EEE;
 }
+
+#graph-display {
+	border: 1px black solid;
+}
+
+#selected-user {
+	display: none;
+}

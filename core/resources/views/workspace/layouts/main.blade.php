@@ -14,6 +14,7 @@
 
         <link rel="stylesheet" href="/css/global.css" />
         <link rel="stylesheet" href="/css/workspace.css" />
+        <link rel="stylesheet" href="/css/vendor/vis.min.css" />
         <link rel="stylesheet" href="/fonts/myriad-pro/style.css" />
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -22,6 +23,7 @@
         <script src='/js/vendor/underscore.js'></script>
         <script src='/js/vendor/socket.io.js'></script>
         <script src='/js/vendor/backbone.js'></script>
+        <script src='/js/vendor/vis.js'></script>
         <script src='/js/config.js'></script>
         <script src='/js/message.js'></script>
 
