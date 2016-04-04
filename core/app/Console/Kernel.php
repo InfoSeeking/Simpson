@@ -14,7 +14,9 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
-        \App\Console\Commands\GenerateApiDocumentation::class
+        \App\Console\Commands\GenerateApiDocumentation::class,
+        \App\Console\Commands\CreateDemo::class,
+        \App\Console\Commands\DestroyDemo::class
     ];
 
     /**

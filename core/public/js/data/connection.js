@@ -73,9 +73,6 @@ var ConnectionListView = Backbone.View.extend({
 	render: function() {
 		var that = this;
 		this.$el.empty();
-		// Show all request links, remove if they are already connected.
-		$('#all-user-list .request-connection').show();
-		$('#all-user-list li[data-id=' + Config.get('userId') + '] .request-connection').hide();
 		this.collection.forEach(function(model){
 			that.add(model);
 		});
@@ -86,10 +83,6 @@ var ConnectionListView = Backbone.View.extend({
 			model.get('recipient_id') != Config.get('userId')) {
 			return;
 		}
-
-		var otherId = model.get('initiator_id');
-		if (otherId == Config.get('userId')) otherId = model.get('recipient_id');
-		$('#all-user-list li[data-id=' + otherId + '] .request-connection').hide();
 
 		var item = new ConnectionListItemView({model: model});
 		item.render();
@@ -157,22 +150,11 @@ var ConnectionGraphView = Backbone.View.extend({
 			$('#selected-user').find('.name').html(user.get('name'));
 			$('#selected-user').find('.request-connection').attr('data-id', node.id);
 			var hideRequest = false;
-			// If we're selecting someone we're already connected to, 
-			// or if we're selecting ourselves, do not show request connection button.
-			if (Config.get('userId') == node.id) {
-				hideRequest = true;
-			}
-			if(that.collection.where({initiator_id: Config.get('userId'), recipient_id: node.id}).length > 0) {
-				hideRequest = true;
-			}
-			if(that.collection.where({initiator_id: node.id, recipient_id: Config.get('userId')}).length > 0) {
-				hideRequest = true;
-			}
 
-			if (hideRequest) {
-				$('#selected-user .request-connection').hide();
+			if (canRequestConnection(node.id)) {
+				$('#selected-user .request-connection').show();	
 			} else {
-				$('#selected-user .request-connection').show();
+				$('#selected-user .request-connection').hide();
 			}
 
 			$('#selected-user').show();

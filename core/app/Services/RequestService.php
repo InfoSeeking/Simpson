@@ -87,11 +87,10 @@ class RequestService {
 	public function create($args) {
 		$validator = Validator::make($args, [
 			'type' => 'required|string',
-			'status' => 'sometimes|string',
-			'recipient_id' => 'required|exists:users,id',
-			'intermediary_id' => 'sometimes|exists:users,id',
-			'project_id' => 'required|exists:projects,id',
-			'answer_id' => 'sometimes|exists:answers,id',
+			'recipient_id' => 'required|integer|exists:users,id',
+			'intermediary_id' => 'sometimes|integer|exists:users,id',
+			'project_id' => 'required|integer|exists:projects,id',
+			'answer_id' => 'sometimes|integer|exists:answers,id',
 			]);
 
 		if ($validator->fails()) {
@@ -102,7 +101,8 @@ class RequestService {
 
 		$request = new Request($args);
 		$request->initiator_id = $this->user->id;
-		$request->project_id = $args['project_id'];
+		$request->recipient_id = intval($args['recipient_id']);
+		$request->project_id = intval($args['project_id']);
 		$request->state = 'open';
 		$request->save();
 

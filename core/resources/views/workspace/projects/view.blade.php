@@ -118,6 +118,46 @@ connectionListView.render();
 var connectionGraphView = new ConnectionGraphView({ collection: connectionList });
 connectionGraphView.render();
 
+function connectionExists(a, b) {
+	if(connectionList.where({initiator_id: a, recipient_id: b}).length > 0) {
+		return true;
+	}
+	if(connectionList.where({initiator_id: a, recipient_id: b}).length > 0) {
+		return true;
+	}
+	return false;
+}
+
+function canRequestConnection(to) {
+	var canRequest = true;
+	var userId = Config.get('userId');
+	// Check if self.
+	if (userId == to) return false;
+	// Check if connection exists.
+	if (connectionExists(userId, to)) return false;
+	// Check if request already in progress from either side.
+	if (outgoingRequestList.where({initiator_id: userId, recipient_id: to, type: 'connection'}).length > 0) {
+		return false;
+	}
+	if (incomingRequestList.where({initiator_id: to, recipient_id: userId, type: 'connection'}).length > 0) {
+		return false;
+	}
+	return true;
+}
+
+function refreshAllUsers() {
+	var userId = Config.get('userId');
+	userList.each(function(user) {
+		var otherId = user.get('id');
+		if (canRequestConnection(otherId)) {
+			$('#all-user-list li[data-id=' + otherId + '] .request-connection').show();
+		} else {
+			$('#all-user-list li[data-id=' + otherId + '] .request-connection').hide();	
+		}
+		
+	})
+}
+
 function realtimeDataHandler(param) {
 	console.log(param);
 	if(param.dataType == 'requests') {
@@ -132,6 +172,7 @@ function realtimeDataHandler(param) {
 				return;
 			}
 			if (param.action == 'create') {
+				console.log('adding', request);
 				requestList.add(request);
 			} else if (param.action == 'delete') {
 				requestList.remove(request);
@@ -148,6 +189,7 @@ function realtimeDataHandler(param) {
 			}
 		});
 	}
+	refreshAllUsers();
 }
 
 Realtime.init(realtimeDataHandler);
@@ -167,17 +209,19 @@ $('.request-connection').on('click', onConnectionClick);
 function onConnectionClick(e){
 	e.preventDefault();
 	var recipientId = $(this).attr('data-id');
+	$(this).hide();
 	$.ajax({
 		url: '/api/v1/requests',
 		method: 'post',
 		dataType: 'json',
 		data: {
-			project_id: Config.get('projectId'),
-			recipient_id: recipientId,
+			project_id: parseInt(Config.get('projectId')),
+			recipient_id: parseInt(recipientId),
 			type: 'connection'
 		},
 		success: function(resp) {
-			MessageDisplay.display(['Connection request sent'], 'success');
+			//MessageDisplay.display(['Connection request sent'], 'success');
+
 		},
 		error: function(xhr) {
 			var json = JSON.parse(xhr.responseText);
@@ -185,6 +229,8 @@ function onConnectionClick(e){
 		}
 	});
 }
+
+refreshAllUsers();
 
 </script>
 @endsection('main-content')
