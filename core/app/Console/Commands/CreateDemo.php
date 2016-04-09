@@ -11,6 +11,7 @@ use App\Models\Request;
 use App\Services\ConnectionService;
 use App\Services\RequestService;
 use App\Models\User;
+use Faker;
 
 class CreateDemo extends Command
 {
@@ -51,7 +52,7 @@ class CreateDemo extends Command
         $demoUser = User::where('email', 'simpson_demo@demo.demo')->first();
 
         $project = new Project();
-        $project->title = 'SIMPSON Demo Project';
+        $project->title = 'SIMPSON Demo Study';
         $project->creator_id = $demoUser->id;
         $project->save();
 
@@ -65,8 +66,9 @@ class CreateDemo extends Command
 
         // Create 20 other users for project.
         for ($i = 0; $i < 20; $i++) {
+            $faker = Faker\Factory::create();
             $user = new User();
-            $user->name = str_random(10);
+            $user->name = $faker->name;
             $user->email = 'email' . $i . '@demo-temp.demo';
             $user->password = bcrypt('test');
             $user->save();

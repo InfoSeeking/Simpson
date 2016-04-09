@@ -12,8 +12,8 @@ use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
 class AuthController extends Controller
 {
-    protected $redirectPath = '/workspace';
-    protected $redirectTo = '/workspace';
+    protected $redirectPath = '/workspace/projects';
+    protected $redirectTo = '/workspace/projects';
     protected $redirectAfterLogout = '/auth/login';
     /*
     |--------------------------------------------------------------------------
@@ -72,11 +72,7 @@ class AuthController extends Controller
      * Called when the user is authenticated
      */
     protected function authenticated(Request $req, User $user) {
-        if ($req->has('after_login_redirect')) {
-            return redirect($req->input('after_login_redirect'));
-        } else {
-            return redirect($this->redirectPath());
-        }
+        return redirect($this->redirectPath());
     }
 
     public function demoLogin(Request $req) {

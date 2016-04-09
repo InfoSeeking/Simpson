@@ -9,9 +9,6 @@ page-shared-projects
 @endif
 @endsection
 
-@section('navigation')
-<a href='/workspace/projects'><span class='fa fa-folder-open-o'></span> Projects</a>
-@endsection('navigation')
 
 @section('main-content')
 @include('helpers.showAllMessages')
@@ -19,11 +16,6 @@ page-shared-projects
 <div class='row'>
 	<div class='col-md-8'>
 		<p class='welcome'>
-		@if ($type == 'mine')		
-			Here you can manage, update, and share your projects.
-		@elseif ($type == 'shared')
-			Projects which other users share with you appear here.
-		@endif
 		</p>
 
 
@@ -41,18 +33,14 @@ page-shared-projects
 
 		<ul id='project-list'>
 		@foreach($projects as $project)
-		<li>
+		<li class='row'>
 			<h4>
 				<a href='/workspace/projects/{{ $project->id}}'>{{ $project->title }}</a>
-				<small>
-				@if ($project->creator_id == $user->id || $project->level == 'o')
-				<a href='/workspace/projects/{{ $project->id}}/settings'>Settings</a>
-				@else
-				{{ ucfirst($memberService->permissionToString($project->level)) }} permission.
-				@endif
-				</small>
 			</h4>
-			<p>{{ $project->description or 'No description.' }}</p>		
+			<a href='/workspace/projects/{{ $project->id}}' class='btn btn-primary pull-right'>Enter Study &raquo;</a>
+			<p>{{ $project->description or 'No description.' }}</p>
+			<br/>
+
 		</li>
 		@endforeach
 		</ul>

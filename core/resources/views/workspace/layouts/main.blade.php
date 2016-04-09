@@ -40,7 +40,7 @@
             <nav id='page-navigation' class="navbar-fixed">
                 <div class="container-fluid">
                     <div class="navbar-header">
-                        <a class="navbar-brand" href="/workspace">Simpson</a>
+                        <a class="navbar-brand" href="/workspace/projects">Simpson</a>
                         @if (isset($user) && $user->avatar)
                             <a href='/workspace/user/settings' class='profile' ><img src='/images/users/{{ $user->id }}.png' /></a>
                         @endif

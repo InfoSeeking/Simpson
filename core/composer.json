@@ -10,10 +10,10 @@
         "0x46616c6b/etherpad-lite-client": "dev-master",
         "ext-fileinfo": "*",
         "ext-gd": "*",
-        "doctrine/dbal": "v2.5.4"
+        "doctrine/dbal": "v2.5.4",
+        "fzaninotto/faker": "^1.5"
     },
     "require-dev": {
-        "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~4.0",
         "phpspec/phpspec": "~2.1"

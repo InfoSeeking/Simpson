@@ -44,7 +44,7 @@ class DestroyDemo extends Command
     public function handle()
     {
         $demoUser = User::where('email', 'simpson_demo@demo.demo')->first();
-        Project::where('title', 'SIMPSON Demo Project')->where('creator_id', $demoUser->id)->delete();
+        Project::where('title', 'SIMPSON Demo Study')->where('creator_id', $demoUser->id)->delete();
 
         $users = User::where('email', 'like', '%demo-temp.demo')->get();
         Connection::whereIn('recipient_id', $users->pluck('id'))->delete();
