@@ -13,6 +13,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 
+use App\Services\AnswerService;
 use App\Services\ProjectService;
 use App\Services\MembershipService;
 use App\Services\RequestService;
@@ -25,11 +26,13 @@ class WorkspaceController extends Controller
         ProjectService $projectService,
         MembershipService $memberService,
         RequestService $requestService,
-        ConnectionService $connectionService) {
+        ConnectionService $connectionService,
+        AnswerService $answerService) {
         $this->projectService = $projectService;
         $this->memberService = $memberService;
         $this->requestService = $requestService;
         $this->connectionService = $connectionService;
+        $this->answerService = $answerService;
     }
 
     public function showProjectCreate() {
@@ -94,13 +97,17 @@ class WorkspaceController extends Controller
         $connectionsStatus = $this->connectionService->getMultiple(['project_id' => $projectId]);
         if (!$connectionsStatus->isOK()) return $connectionsStatus->asRedirect('workspace');
 
+        $answersStatus = $this->answerService->getMultiple(['project_id' => $projectId]);
+        if (!$answersStatus->isOK()) return $answersStatus->asRedirect('workspace');
+
         return view('workspace.projects.view', [
             'project' => $projectStatus->getResult(),
             'permission' => $permissionStatus->getResult(),
             'user' => Auth::user(),
             'sharedUsers' => $sharedUsersStatus->getResult(),
             'requests' => $requestsStatus->getResult(),
-            'connections' => $connectionsStatus->getResult()
+            'connections' => $connectionsStatus->getResult(),
+            'answers' => $answersStatus->getResult()
             ]);
     }
 

@@ -39,9 +39,8 @@ page-view
 </div>
 <div class='col-md-6'>
 	<p>Welcome to your study project.</p>
-	<h4>Questions</h4>
-	<h5>You have Answered (TODO)</h5>
-	<h5>You need to Answer (TODO)</h5>
+	<h4>Question List</h4>
+	<ul id='answer-list'></ul>
 
 	<h4>Outgoing Connection Requests</h4>
 	<ul id='outgoing-request-list'></ul>
@@ -77,12 +76,20 @@ They rejected.
 You are connected to <%= other_name %>.
 </script>
 
+<script type='text/template' data-template='answer'>
+<span title=<% if (answered) { %> Answered <% } else { %> Unanswered <% } %> >
+<%= name %>
+</a>
+
+</script>
+
 <script src='/js/realtime.js'></script>
 <script src='/js/data/layouts.js'></script>
 <script src='/js/data/feed.js'></script>
 <script src='/js/data/user.js'></script>
 <script src='/js/data/request.js'></script>
 <script src='/js/data/connection.js'></script>
+<script src='/js/data/answer.js'></script>
 <script src='/js/vendor/moment.js'></script>
 <script>
 Config.setAll({
@@ -117,6 +124,11 @@ connectionListView.render();
 
 var connectionGraphView = new ConnectionGraphView({ collection: connectionList });
 connectionGraphView.render();
+
+// These are only my own answers.
+var answerList = new AnswerCollection({!! $answers->toJSON() !!});
+var answerListView = new AnswerListView({ collection: answerList });
+answerListView.render();
 
 function connectionExists(a, b) {
 	if(connectionList.where({initiator_id: a, recipient_id: b}).length > 0) {
@@ -187,6 +199,12 @@ function realtimeDataHandler(param) {
 			} else if (param.action == 'delete') {
 				connectionList.remove(connection);
 			}
+		});
+	} else if (param.dataType == 'answer') {
+		_.each(param.data, function(answer) {
+			// Only add answers we have.
+			if (answer.user_id != Config.get('userId')) return;
+			answerList.add(answer);
 		});
 	}
 	refreshAllUsers();

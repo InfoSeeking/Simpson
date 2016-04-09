@@ -4,10 +4,11 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Connection;
-use App\Services\ConnectionService;
+use App\Models\Answer;
 use App\Models\Membership;
 use App\Models\Project;
 use App\Models\Request;
+use App\Services\ConnectionService;
 use App\Services\RequestService;
 use App\Models\User;
 
@@ -96,6 +97,24 @@ class CreateDemo extends Command
                     'project_id' => $project->id
                 ]);
             $request->save();
+        }
+        // Create forty answers, assign each user three (including demo user).
+        // Assure each answer is assigned to at least one user.
+        array_push($users, $demoUser);
+        $userIndex = 0;
+        foreach ($users as $user) {
+            for ($i = 0; $i < 40; $i++) {
+                $answer = Answer::create([
+                    'name' => ($i+1),
+                    'project_id' => $project->id,
+                    'user_id' => $user->id
+                    ]);
+                if ($userIndex == $i % 21 || rand(0, 4) == 0) {
+                    $answer->answered = true;
+                    $answer->save();
+                }
+                $userIndex++;
+            }
         }
     }
 }

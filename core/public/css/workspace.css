@@ -480,3 +480,13 @@ footer {
 #selected-user {
 	display: none;
 }
+
+#answer-list .answer {
+	display: inline-block;
+	margin-right: 5px;
+	color: #4F4F4F;
+}
+
+#answer-list .answer.answered {
+	color: #46AB49;
+}

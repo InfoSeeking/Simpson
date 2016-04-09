@@ -90,7 +90,7 @@ class RequestService {
 			'recipient_id' => 'required|integer|exists:users,id',
 			'intermediary_id' => 'sometimes|integer|exists:users,id',
 			'project_id' => 'required|integer|exists:projects,id',
-			'answer_id' => 'sometimes|integer|exists:answers,id',
+			'answer_name' => 'sometimes|string|exists:answers,name',
 			]);
 
 		if ($validator->fails()) {

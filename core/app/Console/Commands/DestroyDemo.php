@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Answer;
 use App\Models\Connection;
 use App\Models\Membership;
 use App\Models\Project;
@@ -51,6 +52,7 @@ class DestroyDemo extends Command
         Request::whereIn('recipient_id', $users->pluck('id'))->delete();
         Request::whereIn('initiator_id', $users->pluck('id'))->delete();
         Membership::whereIn('user_id', $users->pluck('id'))->delete();
+        Answer::whereIn('user_id', $users->pluck('id'))->delete();
 
         User::where('email', 'like', '%demo-temp.demo')->delete();
     }
