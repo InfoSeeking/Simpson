@@ -480,17 +480,33 @@ footer {
 	display: none;
 }
 
-#answer-list .answer {
+#answer-list .answer, .selected-answer span {
 	display: inline-block;
 	margin-right: 5px;
 	padding: 2px;
 	margin-top: 2px;
 	width: 20px;
 	text-align: center;
+	cursor: pointer;
+	border-radius: 2px;
 }
 
+#answer-list .answer.selected, .selected-answer span  {
+	background: #000;
+	color: #FFF;
+}
 #answer-list .answer.answered {
 	background: #46AB49;
 	color: #FFF;
+}
+
+.selected-answer { display: none; }
+
+.user-connection .answer-selected {
+	background: #FF0;
+	padding: 2px;
+	display: inline-block;
 	border-radius: 2px;
+	margin-bottom: 2px;
+	cursor: pointer;
 }

@@ -24,6 +24,9 @@ var AnswerCollection = Backbone.Collection.extend({
 var AnswerListItemView = Backbone.View.extend({
 	tagName: 'div',
 	className: 'answer',
+	events: {
+		'click': 'onClick'
+	},
 	template: _.template($('[data-template=answer]').html()),
 	attributes: function() {
 		return {
@@ -44,6 +47,9 @@ var AnswerListItemView = Backbone.View.extend({
 		}
 		return this;
 	},
+	onClick: function(e) {
+		setSelectedAnswer(this.model);
+	}
 });
 
 

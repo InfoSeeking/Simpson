@@ -28,8 +28,8 @@ page-view
 		<p>Currently selecting <span class='name'></span>. <a href='#' class='request-connection' data-id=''>Request connection</a>
 	</div>
 	
-	<h4>All users</h4>
-	<ul id='all-user-list'>
+	<h4 style='display: none'>All users</h4>
+	<ul style='display: none' id='all-user-list'>
 	@foreach ($sharedUsers as $sharedUser)
 	<li data-id={{$sharedUser->user->id}}>
 	{{$sharedUser->user->name}}
@@ -38,15 +38,15 @@ page-view
 	</ul>
 </div>
 <div class='col-md-6'>
-	<p>Welcome to your study project.</p>
-	<h4>Question List</h4>
-	<ul id='answer-list'></ul>
-
 	<h4>Outgoing Connection Requests</h4>
 	<ul id='outgoing-request-list'></ul>
 
 	<h4>Incoming Connection Requests</h4>
 	<ul id='incoming-request-list'></ul>
+
+	<h4>Question List</h4>
+	<ul id='answer-list'></ul>
+	<p class='selected-answer'>Selecting question <span></span>. Select a user below to ask.</p>
 
 	<h4>Users Connected to You</h4>
 	<ul id='user-connection-list'>
@@ -54,7 +54,7 @@ page-view
 </div>
 
 <script type='text/template' data-template='request'>
-<% if (direction == 'incoming') { %>
+<% if (type=='connection' && direction == 'incoming') { %>
 Recieved a <%= type %> request from <%= initiator_name %>.
 
 <% if (state == 'accepted') %>
@@ -63,21 +63,27 @@ You accepted.
 You rejected.
 <% else if (state == 'open') %>
 <a class='connection-accept'>Accept</a> | <a class='connection-reject'>Reject</a>
-<% } else if (direction == 'outgoing') { %>
+<% } else if (type=='connection' && direction == 'outgoing') { %>
 Sent a <%= type %> request to <%= recipient_name %> |
 <% if (state == 'accepted') %>
 They accepted.
 <% else if (state == 'rejected') %>
 They rejected.
+<% if (state == 'open') %>
+Awaiting response.
 <% } %>
 </script>
 
 <script type='text/template' data-template='user_connection'>
-You are connected to <%= other_name %>.
+You are connected to <span class='connected-user 
+<% if (selectedAnswerId) { %>
+answer-selected
+<% } %>'
+><%= other_name %></span>.
 </script>
 
 <script type='text/template' data-template='answer'>
-<span title=<% if (answered) { %> Answered <% } else { %> Unanswered <% } %> >
+<span data-id='<%= id %>' title=<% if (answered) { %> Answered <% } else { %> Unanswered <% } %> >
 <%= name %>
 </a>
 
@@ -100,16 +106,7 @@ Config.setAll({
 	realtimeServer: '{{ env('REALTIME_SERVER') }}'
 });
 
-var incomingRequestList = new RequestCollection();
-var incomingRequestListView = new IncomingRequestListView({
-	collection: incomingRequestList
-});
-
-var outgoingRequestList = new RequestCollection();
-var outgoingRequestListView = new OutgoingRequestListView({
-	collection: outgoingRequestList
-});
-
+var selectedAnswerId = null;
 var userList = new UserCollection();
 // Add all project users to user collection.
 @foreach ($sharedUsers as $sharedUser)
@@ -117,6 +114,16 @@ userList.add(new UserModel(
 	{!! $sharedUser->user->toJson() !!}
 ));
 @endforeach
+
+
+var requestList = new RequestCollection({!! $requests->toJSON() !!});
+var incomingRequestListView = new IncomingRequestListView({collection: requestList});
+var outgoingRequestListView = new OutgoingRequestListView({collection: requestList});
+
+incomingRequestListView.render();
+outgoingRequestListView.render();
+
+
 
 var connectionList = new ConnectionCollection({!! $connections->toJSON() !!});
 var connectionListView = new ConnectionListView({ collection: connectionList });
@@ -148,10 +155,10 @@ function canRequestConnection(to) {
 	// Check if connection exists.
 	if (connectionExists(userId, to)) return false;
 	// Check if request already in progress from either side.
-	if (outgoingRequestList.where({initiator_id: userId, recipient_id: to, type: 'connection'}).length > 0) {
+	if (requestList.where({initiator_id: userId, recipient_id: to, type: 'connection'}).length > 0) {
 		return false;
 	}
-	if (incomingRequestList.where({initiator_id: to, recipient_id: userId, type: 'connection'}).length > 0) {
+	if (requestList.where({initiator_id: userId, recipient_id: to, type: 'connection'}).length > 0) {
 		return false;
 	}
 	return true;
@@ -170,19 +177,54 @@ function refreshAllUsers() {
 	})
 }
 
+function setSelectedAnswer(answerModel) {
+	var selectedAnswerEl = $('.selected-answer');
+	
+	if (!answerModel) {
+		selectedAnswerId = null;
+		selectedAnswerEl.hide();
+		$('.answer').removeClass('selected');
+		$('.connected-user').removeClass('answer-selected');
+	} else {
+		selectedAnswerId = answerModel.get('id');
+		selectedAnswerEl.find('span').html(answerModel.get('name'));
+		selectedAnswerEl.show();
+		$('.answer').removeClass('selected');
+		$('.answer span[data-id=' + answerModel.get('id') + ']').parent().addClass('selected');
+		$('.connected-user').addClass('answer-selected');
+	}
+}
+
+function handleUserClick(userModel) {
+	if (!selectedAnswerId) return;
+	$.ajax({
+		url: '/api/v1/requests',
+		method: 'post',
+		dataType: 'json',
+		data: {
+			project_id: parseInt(Config.get('projectId')),
+			recipient_id: parseInt(userModel.get('id')),
+			answer_name: answerList.get(selectedAnswerId).get('name'),
+			type: 'answer'
+		},
+		success: function(resp) {
+			if (resp.result.state == "answered") {
+				MessageDisplay.display(['Answer recieved!'], 'success');
+			} else {
+				MessageDisplay.display(['User did not have the answer'], 'danger');
+			}
+		},
+		error: function(xhr) {
+			var json = JSON.parse(xhr.responseText);
+			MessageDisplay.displayIfError(json);
+		}
+	});
+}
+
 function realtimeDataHandler(param) {
 	console.log(param);
 	if(param.dataType == 'requests') {
 		_.each(param.data, function(request) {
-			var requestList = null;
-			// Check if incoming or outgoing or N/A.
-			if (request.initiator_id == Config.get('userId')) {
-				requestList = outgoingRequestList;
-			} else if (request.recipient_id == Config.get('userId')) {
-				requestList = incomingRequestList;
-			} else {
-				return;
-			}
 			if (param.action == 'create') {
 				console.log('adding', request);
 				requestList.add(request);
@@ -200,27 +242,21 @@ function realtimeDataHandler(param) {
 				connectionList.remove(connection);
 			}
 		});
-	} else if (param.dataType == 'answer') {
+	} else if (param.dataType == 'answers') {
 		_.each(param.data, function(answer) {
-			// Only add answers we have.
-			if (answer.user_id != Config.get('userId')) return;
-			answerList.add(answer);
+			if (answer.answered) {
+				// Unselect it if it is selected.
+				if (selectedAnswerId == answer.id) {
+					setSelectedAnswer(null);
+				}
+				answerList.get(answer.id).set(answer);
+			}
 		});
 	}
 	refreshAllUsers();
 }
 
 Realtime.init(realtimeDataHandler);
-
-var rawRequests = {!! $requests->toJSON() !!};
-_.each(rawRequests, function(request) {
-	if (request.initiator_id == Config.get('userId')) {
-		outgoingRequestList.add(request);
-	} else if (request.recipient_id == Config.get('userId')) {
-		incomingRequestList.add(request);
-	}
-});
-
 
 $('.request-connection').on('click', onConnectionClick);
 

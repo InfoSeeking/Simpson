@@ -96,6 +96,7 @@ var IncomingRequestListView = Backbone.View.extend({
 	el: '#incoming-request-list',
 	initialize: function(options) {
 		this.collection.on('add', this.add, this);
+		this.collection.on('change', this.refreshAllUsers, this);
 	},
 	render: function() {
 		this.$el.empty();
@@ -105,6 +106,23 @@ var IncomingRequestListView = Backbone.View.extend({
 		});
 	},
 	add: function(model) {
+		// Filter by only incoming requests.
+		if (model.get('recipient_id') != Config.get('userId')) return;
+		var item = new RequestListItemView({model: model});
+		item.render();
+		this.$el.append(item.$el);
+		var that = this;
+		model.on('destroy', function() {
+			item.remove();
+		});
+	},
+});
+
+var OutgoingRequestListView = IncomingRequestListView.extend({
+	el: '#outgoing-request-list',
+	add: function(model) {
+		// Filter by outgoing requests.
+		if (model.get('initiator_id') != Config.get('userId')) return;
 		var item = new RequestListItemView({model: model});
 		item.render();
 		this.$el.append(item.$el);
@@ -113,10 +131,6 @@ var IncomingRequestListView = Backbone.View.extend({
 			item.remove();
 		});
 	}
-});
-
-var OutgoingRequestListView = IncomingRequestListView.extend({
-	el: '#outgoing-request-list'
 });
 
 // This function will initialize event handlers for the request forms.

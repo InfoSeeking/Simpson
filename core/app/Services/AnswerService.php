@@ -40,17 +40,17 @@ class AnswerService {
 		return Status::fromResult($answers->get());
 	}
 	
-	public function answerRequest(Request $request) {
+	public function handle(Request $request) {
 		if (!$request->type == 'answer') throw new \InvalidArgumentException();
 		$answer = Answer::where('user_id', $request->recipient_id)
 			->where('project_id', $request->project_id)
-			->where('name', $request->answer_name)
+			->where('name', $request->answer_id) // request->answer_id <==> answer->name...
 			->first();
 		if ($answer->answered) {
 			// Check if this user already has this answer.
 			$existingAnswer = Answer::where('user_id', $this->user->id)
 				->where('project_id', $request->project_id)
-				->where('name', $request->answer_name)
+				->where('name', $request->answer_id)
 				->first();
 			if ($existingAnswer->answered) {
 				return Status::fromError('User already has this answer');

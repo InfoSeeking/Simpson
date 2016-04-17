@@ -20,11 +20,13 @@ class RequestService {
 	public function __construct(
 		MembershipService $memberService,
 		RealtimeService $realtimeService,
-		ConnectionService $connectionService
+		ConnectionService $connectionService,
+		AnswerService $answerService
 		) {
 		$this->memberService = $memberService;
 		$this->realtimeService = $realtimeService;
 		$this->connectionService = $connectionService;
+		$this->answerService = $answerService;
 		$this->user = Auth::user();
 	}
 	
@@ -113,6 +115,7 @@ class RequestService {
 		// TODO: handle scoring.
 
 		if ($request->type == 'answer') {
+			$request->answer_id = $args['answer_name'];
 			// This gets an immediate response.
 			$wasAnswered = $this->answerService->handle($request);
 			$request->state = $wasAnswered ? 'answered' : 'not_answered';

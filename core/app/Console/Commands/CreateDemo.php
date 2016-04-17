@@ -100,6 +100,12 @@ class CreateDemo extends Command
                 ]);
             $request->save();
         }
+
+        $otherUserIds = [];
+        foreach ($users as $otherUser) {
+            array_push($otherUserIds, $otherUser->id);
+        }
+
         // Create forty answers, assign each user three (including demo user).
         // Assure each answer is assigned to at least one user.
         array_push($users, $demoUser);
@@ -118,5 +124,7 @@ class CreateDemo extends Command
                 $userIndex++;
             }
         }
+        // Actually give everyone except demo user all answers.
+        Answer::whereIn('user_id', $otherUserIds)->update(['answered' => true]);
     }
 }

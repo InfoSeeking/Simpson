@@ -10,8 +10,10 @@ var ConnectionModel = Backbone.Model.extend({
 
 		if (this.get('initiator_id') == Config.get('userId')) {
 			this.set('other_name', recipient.get('name'));
+			this.set('other_id', recipient.get('id'));
 		} else if (this.get('recipient_id') == Config.get('userId')) {
 			this.set('other_name', initiator.get('name'));
+			this.set('other_id', initiator.get('id'));
 		}
 	},
 	onError: function(model, response) {
@@ -38,6 +40,7 @@ var ConnectionListItemView = Backbone.View.extend({
 	className: 'connection',
 	events: {
 		'click .delete': 'onDelete',
+		'click .connected-user': 'onUserClick'
 	},
 	template: _.template($('[data-template=user_connection]').html()),
 	attributes: function() {
@@ -61,11 +64,16 @@ var ConnectionListItemView = Backbone.View.extend({
 		this.$el.html(html).addClass('user-connection');
 		return this;
 	},
+	onUserClick: function(){
+		// Forward it to main script.
+		handleUserClick(userList.get(this.model.get('other_id')));
+	}
 });
 
 // Only shows connections with current user.
 var ConnectionListView = Backbone.View.extend({
 	el: '#user-connection-list',
+
 	initialize: function(options) {
 		this.collection.on('add', this.add, this);
 		this.collection.on('remove', this.remove, this);
@@ -96,7 +104,7 @@ var ConnectionListView = Backbone.View.extend({
 		var otherId = model.get('initiator_id');
 		if (otherId == Config.get('userId')) otherId = model.get('recipient_id');
 		$('#all-user-list li[data-id=' + otherId + '] .request-connection').show();		
-	}
+	},
 });
 
 var ConnectionGraphView = Backbone.View.extend({
@@ -137,7 +145,7 @@ var ConnectionGraphView = Backbone.View.extend({
 			nodes: {
 				shape: 'dot',
 				font: {
-					size: 22
+					size: 20
 				}
 			}
 		};
