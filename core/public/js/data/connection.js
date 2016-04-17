@@ -109,6 +109,7 @@ var ConnectionListView = Backbone.View.extend({
 
 var ConnectionGraphView = Backbone.View.extend({
 	el: '#connection-graph',
+	selectedUserView: null,
 	initialize: function(options) {
 		var that = this;
 		this.collection.on('add', this.add, this);
@@ -151,24 +152,19 @@ var ConnectionGraphView = Backbone.View.extend({
 		};
 
 		// initialize your network!
+		var that = this;
 		var network = new vis.Network(container, data, options);
 		network.on('selectNode', function(e) {
 			var node = that.nodes.get(e.nodes[0]);
 			var user = userList.get(node.id);
-			$('#selected-user').find('.name').html(user.get('name'));
-			$('#selected-user').find('.request-connection').attr('data-id', node.id);
-			var hideRequest = false;
-
-			if (canRequestConnection(node.id)) {
-				$('#selected-user .request-connection').show();	
-			} else {
-				$('#selected-user .request-connection').hide();
+			if (that.selectedUserView != null) {
+				that.selectedUserView.remove();
 			}
-
-			$('#selected-user').show();
+			that.selectedUserView = new CurrentSelectedView({model: user});
+			that.selectedUserView.render();
 		});
 		network.on('deselectNode', function(e) {
-			$('#selected-user').hide();
+			that.selectedUserView.remove();
 		})
 	},
 	render: function() {
@@ -190,3 +186,45 @@ var ConnectionGraphView = Backbone.View.extend({
 
 	}
 });
+
+var CurrentSelectedView = Backbone.View.extend({
+	el: "#selected-user",
+	template: _.template($('[data-template=selected-user]').html()),
+	events: {
+		'click .request-connection': 'requestConnection'
+	},
+	initialize: function(args) {
+		var that = this;
+		connectionList.on('update', function() {
+			that.render();
+		});
+		requestList.on('update', function() {
+			that.render();
+		});
+	},
+	render: function() {
+		this.$el.empty().html(this.template(this.model.toJSON()));
+	},
+	remove: function() {
+		this.$el.empty();
+	},
+	requestConnection: function(e) {
+		e.preventDefault();
+		var recipientId = this.model.get('id');
+		$.ajax({
+			url: '/api/v1/requests',
+			method: 'post',
+			dataType: 'json',
+			data: {
+				project_id: parseInt(Config.get('projectId')),
+				recipient_id: parseInt(recipientId),
+				type: 'connection'
+			},
+			success: function(resp) {},
+			error: function(xhr) {
+				var json = JSON.parse(xhr.responseText);
+				MessageDisplay.displayIfError(json);
+			}
+		});
+	}
+})

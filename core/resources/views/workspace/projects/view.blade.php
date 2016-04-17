@@ -24,9 +24,7 @@ page-view
 	@include('helpers.showAllMessages')
 	
 	<div id='graph-display'></div>
-	<div id='selected-user'>
-		<p>Currently selecting <span class='name'></span>. <a href='#' class='request-connection' data-id=''>Request connection</a>
-	</div>
+	<div id='selected-user'></div>
 	
 	<h4 style='display: none'>All users</h4>
 	<ul style='display: none' id='all-user-list'>
@@ -52,6 +50,14 @@ page-view
 	<ul id='user-connection-list'>
 	</ul>
 </div>
+
+<script type='text/template' data-template='selected-user'>
+	<p>Currently selecting <span class='name'><%= name %></span>.
+	<% if (canRequestConnection(id)) %>
+	<a href='#' class='request-connection' data-id=''>Request connection</a>
+	<% else if (connectionExists(Config.get('userId'), id)) %>
+	You are connected. <a href='#'class='request-intermediary-connection'>Request connection with a friend.</a>
+</script>
 
 <script type='text/template' data-template='request'>
 <% if (type=='connection' && direction == 'incoming') { %>
@@ -141,7 +147,7 @@ function connectionExists(a, b) {
 	if(connectionList.where({initiator_id: a, recipient_id: b}).length > 0) {
 		return true;
 	}
-	if(connectionList.where({initiator_id: a, recipient_id: b}).length > 0) {
+	if(connectionList.where({initiator_id: b, recipient_id: a}).length > 0) {
 		return true;
 	}
 	return false;
@@ -162,19 +168,6 @@ function canRequestConnection(to) {
 		return false;
 	}
 	return true;
-}
-
-function refreshAllUsers() {
-	var userId = Config.get('userId');
-	userList.each(function(user) {
-		var otherId = user.get('id');
-		if (canRequestConnection(otherId)) {
-			$('#all-user-list li[data-id=' + otherId + '] .request-connection').show();
-		} else {
-			$('#all-user-list li[data-id=' + otherId + '] .request-connection').hide();	
-		}
-		
-	})
 }
 
 function setSelectedAnswer(answerModel) {
@@ -253,38 +246,9 @@ function realtimeDataHandler(param) {
 			}
 		});
 	}
-	refreshAllUsers();
 }
 
 Realtime.init(realtimeDataHandler);
-
-$('.request-connection').on('click', onConnectionClick);
-
-function onConnectionClick(e){
-	e.preventDefault();
-	var recipientId = $(this).attr('data-id');
-	$(this).hide();
-	$.ajax({
-		url: '/api/v1/requests',
-		method: 'post',
-		dataType: 'json',
-		data: {
-			project_id: parseInt(Config.get('projectId')),
-			recipient_id: parseInt(recipientId),
-			type: 'connection'
-		},
-		success: function(resp) {
-			//MessageDisplay.display(['Connection request sent'], 'success');
-
-		},
-		error: function(xhr) {
-			var json = JSON.parse(xhr.responseText);
-			MessageDisplay.displayIfError(json);
-		}
-	});
-}
-
-refreshAllUsers();
 
 </script>
 @endsection('main-content')
