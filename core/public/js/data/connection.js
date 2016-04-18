@@ -191,7 +191,8 @@ var CurrentSelectedView = Backbone.View.extend({
 	el: "#selected-user",
 	template: _.template($('[data-template=selected-user]').html()),
 	events: {
-		'click .request-connection': 'requestConnection'
+		'click .request-connection': 'requestConnection',
+		'click .request-intermediary-connection': 'requestIntermediaryConnection'
 	},
 	initialize: function(args) {
 		var that = this;
@@ -207,6 +208,7 @@ var CurrentSelectedView = Backbone.View.extend({
 	},
 	remove: function() {
 		this.$el.empty();
+		this.undelegateEvents();
 	},
 	requestConnection: function(e) {
 		e.preventDefault();
@@ -226,5 +228,51 @@ var CurrentSelectedView = Backbone.View.extend({
 				MessageDisplay.displayIfError(json);
 			}
 		});
+	},
+	requestIntermediaryConnection: function(e) {
+		e.preventDefault();
+		// Show modal window with current connections.
+		new IntermediarySelectView({
+			model: this.model
+		}).render();
 	}
-})
+});
+
+var IntermediarySelectView = Backbone.View.extend({
+	el: "#select-intermediary-container",
+	template : _.template(
+		$('[data-template=select-intermediary]').html()),
+	initialize: function(args) {},
+	remove: function() {
+		this.$el.empty();
+		this.undelegateEvents();
+	},
+	render: function() {
+		var loggedInUser = userList.get(Config.get('userId'));
+		var that = this;
+		// Get connections with this user.
+		var friends = [];
+		connectionList.each(function(cxn){
+			var otherId = -1;
+			if (cxn.get('recipient_id') == that.model.get('id')) {
+				otherId = cxn.get('initiator_id'); 
+			} else if (cxn.get('initiator_id') == that.model.get('id')) {
+				otherId = cxn.get('recipient_id');
+			}
+			if (otherId == -1) return;
+			if (otherId == loggedInUser.get('id')) return;
+			friends.push(userList.get(otherId));
+		})
+		var templateData = {
+			'user': this.model.toJSON,
+			'friends': friends
+		};
+		this.$el.empty();
+		this.$el.html(this.template(templateData));
+		this.$el.find('#select-intermediary-modal').modal();
+		this.$el.find('#select-intermediary-modal').on('hidden.bs.modal', function() {
+			console.log('here');
+			that.remove();
+		});
+	}
+});

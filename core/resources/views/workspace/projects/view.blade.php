@@ -51,6 +51,40 @@ page-view
 	</ul>
 </div>
 
+<div id='select-intermediary-container'>
+
+</div>
+
+<!-- Select intermediary view -->
+<script type='text/template' data-template='select-intermediary'>
+<div class='row modal fade' tabindex='-1' id='select-intermediary-modal'>
+	<div class='modal-dialog'>
+		<div class='modal-content'>
+			<div class='modal-header'>Select Person to Request Connection</div>
+			<div class='modal-body'>
+				<form method='post' id='create-bookmark'>
+					<div class='form-group'>
+						<% if (friends.length == 0) { %>
+						This user has no other direct connections.
+						<% } else { %>
+						<select class='form-control' name='friends'>
+							<% for (var i = 0; i < friends.length; i++) { %>
+							<option><%= friends[i].get('name') %></option>
+							<% } %>
+						</select>
+						<% } %>
+					</div>
+					<button class='cancel btn btn-danger' data-dismiss='modal'>Close</button>
+					<div class='pull-right'>
+						<button type='submit' class='btn btn-primary'>Request Connection</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+</script>
+
 <script type='text/template' data-template='selected-user'>
 	<p>Currently selecting <span class='name'><%= name %></span>.
 	<% if (canRequestConnection(id)) %>

@@ -84,7 +84,7 @@ class CreateDemo extends Command
 
         shuffle($users);
         // Create a few connections to start and some requests to simpson demo.
-        for ($i = 0; $i < 10; $i += 3) {
+        for ($i = 0; $i < 10; $i += 2) {
             $connection = new Connection([
                 'initiator_id' => $users[$i]->id,
                 'recipient_id' => $users[$i+1]->id,
