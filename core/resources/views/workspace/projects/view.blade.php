@@ -62,23 +62,21 @@ page-view
 		<div class='modal-content'>
 			<div class='modal-header'>Select Person to Request Connection</div>
 			<div class='modal-body'>
-				<form method='post' id='create-bookmark'>
-					<div class='form-group'>
-						<% if (friends.length == 0) { %>
-						This user has no other direct connections.
-						<% } else { %>
-						<select class='form-control' name='friends'>
-							<% for (var i = 0; i < friends.length; i++) { %>
-							<option><%= friends[i].get('name') %></option>
-							<% } %>
-						</select>
+				<div class='form-group'>
+					<% if (friends.length == 0) { %>
+					This user has no other available direct connections to request.
+					<% } else { %>
+					<select class='form-control' name='friends'>
+						<% for (var i = 0; i < friends.length; i++) { %>
+						<option value=<%= friends[i].get('id') %>><%= friends[i].get('name') %></option>
 						<% } %>
-					</div>
-					<button class='cancel btn btn-danger' data-dismiss='modal'>Close</button>
-					<div class='pull-right'>
-						<button type='submit' class='btn btn-primary'>Request Connection</button>
-					</div>
-				</form>
+					</select>
+					<% } %>
+				</div>
+				<button class='cancel btn btn-danger' data-dismiss='modal'>Close</button>
+				<div class='pull-right'>
+					<button type='submit' class='btn-request-connection btn btn-primary'>Request Connection</button>
+				</div>
 			</div>
 		</div>
 	</div>

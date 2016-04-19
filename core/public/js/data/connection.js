@@ -192,7 +192,7 @@ var CurrentSelectedView = Backbone.View.extend({
 	template: _.template($('[data-template=selected-user]').html()),
 	events: {
 		'click .request-connection': 'requestConnection',
-		'click .request-intermediary-connection': 'requestIntermediaryConnection'
+		'click .request-intermediary-connection': 'showRequestIntermediaryConnectionModal'
 	},
 	initialize: function(args) {
 		var that = this;
@@ -229,7 +229,7 @@ var CurrentSelectedView = Backbone.View.extend({
 			}
 		});
 	},
-	requestIntermediaryConnection: function(e) {
+	showRequestIntermediaryConnectionModal: function(e) {
 		e.preventDefault();
 		// Show modal window with current connections.
 		new IntermediarySelectView({
@@ -242,6 +242,9 @@ var IntermediarySelectView = Backbone.View.extend({
 	el: "#select-intermediary-container",
 	template : _.template(
 		$('[data-template=select-intermediary]').html()),
+	events: {
+		'click .btn-request-connection': 'requestIntermediaryConnection'
+	},
 	initialize: function(args) {},
 	remove: function() {
 		this.$el.empty();
@@ -261,7 +264,7 @@ var IntermediarySelectView = Backbone.View.extend({
 			}
 			if (otherId == -1) return;
 			if (otherId == loggedInUser.get('id')) return;
-			friends.push(userList.get(otherId));
+			if (canRequestConnection(otherId)) friends.push(userList.get(otherId));
 		})
 		var templateData = {
 			'user': this.model.toJSON,
@@ -271,8 +274,29 @@ var IntermediarySelectView = Backbone.View.extend({
 		this.$el.html(this.template(templateData));
 		this.$el.find('#select-intermediary-modal').modal();
 		this.$el.find('#select-intermediary-modal').on('hidden.bs.modal', function() {
-			console.log('here');
 			that.remove();
+		});
+	},
+	requestIntermediaryConnection: function(e) {
+		e.preventDefault();
+		this.$el.find('#select-intermediary-modal').modal('hide');
+		var recipientId = parseInt(this.$el.find('[name=friends] option:selected').val());
+		var intermediaryId = this.model.get('id');
+		$.ajax({
+			url: '/api/v1/requests',
+			method: 'post',
+			dataType: 'json',
+			data: {
+				project_id: parseInt(Config.get('projectId')),
+				recipient_id: parseInt(recipientId),
+				intermediary_id: parseInt(intermediaryId),
+				type: 'connection'
+			},
+			success: function(resp) {},
+			error: function(xhr) {
+				var json = JSON.parse(xhr.responseText);
+				MessageDisplay.displayIfError(json);
+			}
 		});
 	}
 });
