@@ -40,7 +40,7 @@ var ConnectionListItemView = Backbone.View.extend({
 	className: 'connection',
 	events: {
 		'click .delete': 'onDelete',
-		'click .connected-user': 'onUserClick'
+		'click .btn-ask': 'onClickAsk'
 	},
 	template: _.template($('[data-template=user_connection]').html()),
 	attributes: function() {
@@ -64,16 +64,16 @@ var ConnectionListItemView = Backbone.View.extend({
 		this.$el.html(html).addClass('user-connection');
 		return this;
 	},
-	onUserClick: function(){
-		// Forward it to main script.
-		handleUserClick(userList.get(this.model.get('other_id')));
+	onClickAsk: function(e) {
+		e.preventDefault();
+		var otherUser = userList.get(this.model.get('other_id'));
+		(new AskView({model: otherUser})).render();
 	}
 });
 
 // Only shows connections with current user.
 var ConnectionListView = Backbone.View.extend({
 	el: '#user-connection-list',
-
 	initialize: function(options) {
 		this.collection.on('add', this.add, this);
 		this.collection.on('remove', this.remove, this);
@@ -104,7 +104,7 @@ var ConnectionListView = Backbone.View.extend({
 		var otherId = model.get('initiator_id');
 		if (otherId == Config.get('userId')) otherId = model.get('recipient_id');
 		$('#all-user-list li[data-id=' + otherId + '] .request-connection').show();		
-	},
+	}
 });
 
 var ConnectionGraphView = Backbone.View.extend({
@@ -267,7 +267,7 @@ var IntermediarySelectView = Backbone.View.extend({
 			if (canRequestConnection(otherId)) friends.push(userList.get(otherId));
 		})
 		var templateData = {
-			'user': this.model.toJSON,
+			'user': this.model.toJSON(),
 			'friends': friends
 		};
 		this.$el.empty();

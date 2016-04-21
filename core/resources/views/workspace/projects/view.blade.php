@@ -51,9 +51,8 @@ page-view
 	</ul>
 </div>
 
-<div id='select-intermediary-container'>
-
-</div>
+<div id='select-intermediary-container'></div>
+<div id='modal-container'></div>
 
 <!-- Select intermediary view -->
 <script type='text/template' data-template='select-intermediary'>
@@ -76,6 +75,34 @@ page-view
 				<button class='cancel btn btn-danger' data-dismiss='modal'>Close</button>
 				<div class='pull-right'>
 					<button type='submit' class='btn-request-connection btn btn-primary'>Request Connection</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</script>
+
+<!-- Select question view -->
+<script type='text/template' data-template='select-question'>
+<div class='row modal fade' tabindex='-1' id='select-question-modal'>
+	<div class='modal-dialog'>
+		<div class='modal-content'>
+			<div class='modal-header'>Select Question to Ask</div>
+			<div class='modal-body'>
+				<div class='form-group'>
+					<% if (questions.length == 0) { %>
+					You have no questions left to answer.
+					<% } else { %>
+					<select class='form-control' name='questions'>
+						<% for (var i = 0; i < questions.length; i++) { %>
+						<option value=<%= questions[i].id %>><%= questions[i].name %></option>
+						<% } %>
+					</select>
+					<% } %>
+				</div>
+				<button class='cancel btn btn-danger' data-dismiss='modal'>Close</button>
+				<div class='pull-right'>
+					<button type='submit' class='btn-ask btn btn-primary'>Ask</button>
 				</div>
 			</div>
 		</div>
@@ -113,11 +140,8 @@ Awaiting response.
 </script>
 
 <script type='text/template' data-template='user_connection'>
-You are connected to <span class='connected-user 
-<% if (selectedAnswerId) { %>
-answer-selected
-<% } %>'
-><%= other_name %></span>.
+You are connected to <span class='connected-user'><%= other_name %></span>.
+<a class='btn-ask btn btn-default'>Ask Question</a>
 </script>
 
 <script type='text/template' data-template='answer'>
@@ -200,50 +224,6 @@ function canRequestConnection(to) {
 		return false;
 	}
 	return true;
-}
-
-function setSelectedAnswer(answerModel) {
-	var selectedAnswerEl = $('.selected-answer');
-	
-	if (!answerModel) {
-		selectedAnswerId = null;
-		selectedAnswerEl.hide();
-		$('.answer').removeClass('selected');
-		$('.connected-user').removeClass('answer-selected');
-	} else {
-		selectedAnswerId = answerModel.get('id');
-		selectedAnswerEl.find('span').html(answerModel.get('name'));
-		selectedAnswerEl.show();
-		$('.answer').removeClass('selected');
-		$('.answer span[data-id=' + answerModel.get('id') + ']').parent().addClass('selected');
-		$('.connected-user').addClass('answer-selected');
-	}
-}
-
-function handleUserClick(userModel) {
-	if (!selectedAnswerId) return;
-	$.ajax({
-		url: '/api/v1/requests',
-		method: 'post',
-		dataType: 'json',
-		data: {
-			project_id: parseInt(Config.get('projectId')),
-			recipient_id: parseInt(userModel.get('id')),
-			answer_name: answerList.get(selectedAnswerId).get('name'),
-			type: 'answer'
-		},
-		success: function(resp) {
-			if (resp.result.state == "answered") {
-				MessageDisplay.display(['Answer recieved!'], 'success');
-			} else {
-				MessageDisplay.display(['User did not have the answer'], 'danger');
-			}
-		},
-		error: function(xhr) {
-			var json = JSON.parse(xhr.responseText);
-			MessageDisplay.displayIfError(json);
-		}
-	});
 }
 
 function realtimeDataHandler(param) {
