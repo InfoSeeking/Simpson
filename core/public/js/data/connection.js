@@ -36,7 +36,7 @@ var ConnectionCollection = Backbone.Collection.extend({
 });
 
 var ConnectionListItemView = Backbone.View.extend({
-	tagName: 'div',
+	tagName: 'tr',
 	className: 'connection',
 	events: {
 		'click .delete': 'onDelete',

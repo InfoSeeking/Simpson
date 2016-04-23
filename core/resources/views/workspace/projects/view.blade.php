@@ -36,19 +36,20 @@ page-view
 	</ul>
 </div>
 <div class='col-md-6'>
+	<p>Current score <b id='user-score'>{{ $userScore }}</b></p>
+
 	<h4>Outgoing Connection Requests</h4>
-	<ul id='outgoing-request-list'></ul>
+	<div id='outgoing-request-list'></div>
 
 	<h4>Incoming Connection Requests</h4>
-	<ul id='incoming-request-list'></ul>
+	<div id='incoming-request-list'></div>
 
 	<h4>Question List</h4>
-	<ul id='answer-list'></ul>
+	<div id='answer-list'></div>
 	<p class='selected-answer'>Selecting question <span></span>. Select a user below to ask.</p>
 
 	<h4>Users Connected to You</h4>
-	<ul id='user-connection-list'>
-	</ul>
+	<table class='table-condensed table-hover' style='width:100%' id='user-connection-list'></table>
 </div>
 
 <div id='select-intermediary-container'></div>
@@ -74,7 +75,9 @@ page-view
 				</div>
 				<button class='cancel btn btn-danger' data-dismiss='modal'>Close</button>
 				<div class='pull-right'>
+					<% if (friends.length > 0) { %>
 					<button type='submit' class='btn-request-connection btn btn-primary'>Request Connection</button>
+					<% } %>
 				</div>
 			</div>
 		</div>
@@ -111,7 +114,7 @@ page-view
 </script>
 
 <script type='text/template' data-template='selected-user'>
-	<p>Currently selecting <span class='name'><%= name %></span>.
+	<p>Selecting <span class='name'><%= name %></span>.
 	<% if (canRequestConnection(id)) %>
 	<a href='#' class='request-connection' data-id=''>Request connection</a>
 	<% else if (connectionExists(Config.get('userId'), id)) %>
@@ -140,12 +143,12 @@ Awaiting response.
 </script>
 
 <script type='text/template' data-template='user_connection'>
-You are connected to <span class='connected-user'><%= other_name %></span>.
-<a class='btn-ask btn btn-default'>Ask Question</a>
+	<td>You are connected to <span class='connected-user'><%= other_name %></span>.</td>
+	<td><a class='btn-ask btn btn-default'>Ask Question</a></td>
 </script>
 
 <script type='text/template' data-template='answer'>
-<span data-id='<%= id %>' title=<% if (answered) { %> Answered <% } else { %> Unanswered <% } %> >
+<span data-id='<%= id %>' title="<% if (answered) { %> Answered <% } else { %> Unanswered <% } %>" >
 <%= name %>
 </a>
 
@@ -231,7 +234,6 @@ function realtimeDataHandler(param) {
 	if(param.dataType == 'requests') {
 		_.each(param.data, function(request) {
 			if (param.action == 'create') {
-				console.log('adding', request);
 				requestList.add(request);
 			} else if (param.action == 'delete') {
 				requestList.remove(request);
@@ -257,6 +259,12 @@ function realtimeDataHandler(param) {
 				answerList.get(answer.id).set(answer);
 			}
 		});
+	} else if (param.dataType == 'scores') {
+		_.each(param.data, function(score) {
+			if (score.user_id == Config.get('userId')) {
+				$('#user-score').html(score.score);
+			}
+		})
 	}
 }
 

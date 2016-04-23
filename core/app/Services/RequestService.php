@@ -13,6 +13,7 @@ use App\Services\AnswerService;
 use App\Services\MembershipService;
 use App\Services\ConnectionService;
 use App\Services\RealtimeService;
+use App\Services\ScoreService;
 use App\Utilities\Status;
 use App\Utilities\StatusCodes;
 
@@ -21,12 +22,14 @@ class RequestService {
 		MembershipService $memberService,
 		RealtimeService $realtimeService,
 		ConnectionService $connectionService,
-		AnswerService $answerService
+		AnswerService $answerService,
+		ScoreService $scoreService
 		) {
 		$this->memberService = $memberService;
 		$this->realtimeService = $realtimeService;
 		$this->connectionService = $connectionService;
 		$this->answerService = $answerService;
+		$this->scoreService = $scoreService;
 		$this->user = Auth::user();
 	}
 	
@@ -112,7 +115,8 @@ class RequestService {
 			return Status::fromError('Cannot send request to self');
 		}
 
-		// TODO: handle scoring.
+		// Update scores.
+		$this->scoreService->applyRequestScore($request);
 
 		if ($request->type == 'answer') {
 			$request->answer_id = $args['answer_name'];
@@ -120,6 +124,8 @@ class RequestService {
 			$wasAnswered = $this->answerService->handle($request);
 			$request->state = $wasAnswered ? 'answered' : 'not_answered';
 			$request->save();
+			// Update scores.
+			$this->scoreService->applyRequestScore($request);
 		}
 
 		$this->realtimeService
@@ -193,6 +199,7 @@ class RequestService {
 
 		$request->state = $args['state'];
 		$request->save();
+		$this->scoreService->applyRequestScore($request);
 
 		$this->realtimeService
 			->withModel($request)

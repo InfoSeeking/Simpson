@@ -18,6 +18,7 @@ use App\Services\ProjectService;
 use App\Services\MembershipService;
 use App\Services\RequestService;
 use App\Services\ConnectionService;
+use App\Services\ScoreService;
 use App\Utilities\Status;
 
 class WorkspaceController extends Controller
@@ -27,12 +28,14 @@ class WorkspaceController extends Controller
         MembershipService $memberService,
         RequestService $requestService,
         ConnectionService $connectionService,
-        AnswerService $answerService) {
+        AnswerService $answerService,
+        ScoreService $scoreService) {
         $this->projectService = $projectService;
         $this->memberService = $memberService;
         $this->requestService = $requestService;
         $this->connectionService = $connectionService;
         $this->answerService = $answerService;
+        $this->scoreService = $scoreService;
     }
 
     public function showProjectCreate() {
@@ -104,6 +107,7 @@ class WorkspaceController extends Controller
             'project' => $projectStatus->getResult(),
             'permission' => $permissionStatus->getResult(),
             'user' => Auth::user(),
+            'userScore' => $this->scoreService->get($projectId),
             'sharedUsers' => $sharedUsersStatus->getResult(),
             'requests' => $requestsStatus->getResult(),
             'connections' => $connectionsStatus->getResult(),
