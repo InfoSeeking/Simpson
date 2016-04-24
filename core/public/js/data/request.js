@@ -36,7 +36,7 @@ var RequestCollection = Backbone.Collection.extend({
 });
 
 var RequestListItemView = Backbone.View.extend({
-	tagName: 'div',
+	tagName: 'tr',
 	className: 'request',
 	events: {
 		'click .delete': 'onDelete',
@@ -85,7 +85,12 @@ var RequestListItemView = Backbone.View.extend({
 		});
 	},
 	render: function() {
-		var html = this.template(this.model.toJSON());
+		var data = {
+			request: this.model.toJSON(),
+			acceptCost: getCost('accept', this.model.get('id')),
+			rejectCost: getCost('reject', this.model.get('id'))
+		};
+		var html = this.template(data);
 		this.$el.html(html).addClass(this.model.get('direction') + '-request');
 		return this;
 	},
@@ -115,6 +120,7 @@ var IncomingRequestListView = Backbone.View.extend({
 		model.on('destroy', function() {
 			item.remove();
 		});
+		this.$el.parent().scrollTop(this.$el.prop('scrollHeight'));
 	},
 });
 
@@ -130,6 +136,7 @@ var OutgoingRequestListView = IncomingRequestListView.extend({
 		model.on('destroy', function() {
 			item.remove();
 		});
+		this.$el.parent().scrollTop(this.$el.prop('scrollHeight'));
 	}
 });
 

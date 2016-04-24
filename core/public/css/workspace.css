@@ -486,7 +486,6 @@ footer {
 	margin-top: 2px;
 	width: 20px;
 	text-align: center;
-	cursor: pointer;
 	border-radius: 2px;
 }
 
@@ -508,4 +507,21 @@ footer {
 	border-radius: 2px;
 	margin-bottom: 2px;
 	cursor: pointer;
+}
+
+.cost.cost-p {
+	color: #4DB339;
+}
+
+.cost.cost-p:before {
+	content: '+';
+}
+
+.cost.cost-n {
+	color: #B33B3B;
+}
+
+.scrollpane {
+	max-height: 220px;
+	overflow: auto;
 }

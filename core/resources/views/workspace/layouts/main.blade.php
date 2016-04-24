@@ -62,8 +62,8 @@
 
             <div class="container-fluid" id="body-container">
                 <div class="row">
-                    <div class='col-md-2 sidebar'>@yield('sidebar')</div>
-                    <div class="col-md-10 main-content">
+                    
+                    <div class="col-md-12 main-content">
                         @yield('main-content')
                     </div>
                 </div>

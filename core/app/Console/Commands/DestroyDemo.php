@@ -9,6 +9,7 @@ use App\Models\Membership;
 use App\Models\Project;
 use App\Models\Request;
 use App\Models\User;
+use App\Models\Score;
 
 class DestroyDemo extends Command
 {
@@ -53,6 +54,7 @@ class DestroyDemo extends Command
         Request::whereIn('initiator_id', $users->pluck('id'))->delete();
         Membership::whereIn('user_id', $users->pluck('id'))->delete();
         Answer::whereIn('user_id', $users->pluck('id'))->delete();
+        Score::whereIn('user_id', $users->pluck('id'))->delete();
 
         User::where('email', 'like', '%demo-temp.demo')->delete();
     }

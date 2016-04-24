@@ -34,22 +34,28 @@ page-view
 	<a href='#' class='request-connection' style='display:none' data-id='{{ $sharedUser->user->id }}'>Request connection</a></li>
 	@endforeach
 	</ul>
+
+	<h4>Outgoing Connection Requests</h4>
+	<div class='scrollpane'>
+		<table class='table table-condensed table-hover' id='outgoing-request-list'></table>
+	</div>
 </div>
 <div class='col-md-6'>
 	<p>Current score <b id='user-score'>{{ $userScore }}</b></p>
-
-	<h4>Outgoing Connection Requests</h4>
-	<div id='outgoing-request-list'></div>
-
-	<h4>Incoming Connection Requests</h4>
-	<div id='incoming-request-list'></div>
 
 	<h4>Question List</h4>
 	<div id='answer-list'></div>
 	<p class='selected-answer'>Selecting question <span></span>. Select a user below to ask.</p>
 
 	<h4>Users Connected to You</h4>
-	<table class='table-condensed table-hover' style='width:100%' id='user-connection-list'></table>
+	<table class='table table-condensed table-hover' id='user-connection-list'></table>
+
+	<h4>Incoming Connection Requests</h4>
+	<div class='scrollpane'>
+		<table class='table table-condensed table-hover' id='incoming-request-list'></table>
+	</div>
+
+	
 </div>
 
 <div id='select-intermediary-container'></div>
@@ -72,6 +78,7 @@ page-view
 						<% } %>
 					</select>
 					<% } %>
+					<p>The cost of this request is <span class='cost'>0</span></p>
 				</div>
 				<button class='cancel btn btn-danger' data-dismiss='modal'>Close</button>
 				<div class='pull-right'>
@@ -114,37 +121,50 @@ page-view
 </script>
 
 <script type='text/template' data-template='selected-user'>
-	<p>Selecting <span class='name'><%= name %></span>.
-	<% if (canRequestConnection(id)) %>
-	<a href='#' class='request-connection' data-id=''>Request connection</a>
-	<% else if (connectionExists(Config.get('userId'), id)) %>
+	<p>Selecting <span class='name'><%= user.name %></span>.
+	<% if (canRequestConnection(user.id)) %>
+	<a href='#' class='request-connection' data-id=''>Request connection <span class='cost cost-<%= cost.sign %>'>(<%= cost.cost %>)</span></a>
+	<% else if (connectionExists(Config.get('userId'), user.id)) %>
 	You are connected. <a href='#'class='request-intermediary-connection'>Request connection with a friend.</a>
 </script>
 
 <script type='text/template' data-template='request'>
-<% if (type=='connection' && direction == 'incoming') { %>
-Recieved a <%= type %> request from <%= initiator_name %>.
+<% if (request.type=='connection' && request.direction == 'incoming') { %>
+<td>
+Request to connect from <%= request.initiator_name %>.
+</td>
 
-<% if (state == 'accepted') %>
+<td>
+<% if (request.state == 'accepted') %>
 You accepted.
-<% else if (state == 'rejected') %>
+<% else if (request.state == 'rejected') %>
 You rejected.
-<% else if (state == 'open') %>
-<a class='connection-accept'>Accept</a> | <a class='connection-reject'>Reject</a>
-<% } else if (type=='connection' && direction == 'outgoing') { %>
-Sent a <%= type %> request to <%= recipient_name %> |
-<% if (state == 'accepted') %>
+<% else if (request.state == 'open') %>
+<a class='connection-accept btn btn-default'>Accept <span class='cost cost-<%= acceptCost.sign %>'>(<%= acceptCost.cost %>)</span></a>
+&nbsp;
+<a class='connection-reject btn btn-default'>Reject <span class='cost cost-<%= rejectCost.sign %>'>(<%= rejectCost.cost %>)</span></a>
+</td>
+
+<% } else if (request.type=='connection' && request.direction == 'outgoing') { %>
+<td>
+Sent a <%= request.type %> request to <%= request.recipient_name %>
+</td>
+
+<td>
+<% if (request.state == 'accepted') %>
 They accepted.
-<% else if (state == 'rejected') %>
+<% else if (request.state == 'rejected') %>
 They rejected.
-<% if (state == 'open') %>
+<% if (request.state == 'open') %>
 Awaiting response.
 <% } %>
+</td>
+
 </script>
 
 <script type='text/template' data-template='user_connection'>
-	<td>You are connected to <span class='connected-user'><%= other_name %></span>.</td>
-	<td><a class='btn-ask btn btn-default'>Ask Question</a></td>
+	<td>You are connected to <span class='connected-user'><%= connection.other_name %></span>.</td>
+	<td><a class='btn-ask btn btn-default'>Ask Question <span class='cost cost-<%= cost.sign %>'>(<%= cost.cost %>)</span></a></td>
 </script>
 
 <script type='text/template' data-template='answer'>
@@ -188,8 +208,6 @@ var outgoingRequestListView = new OutgoingRequestListView({collection: requestLi
 incomingRequestListView.render();
 outgoingRequestListView.render();
 
-
-
 var connectionList = new ConnectionCollection({!! $connections->toJSON() !!});
 var connectionListView = new ConnectionListView({ collection: connectionList });
 connectionListView.render();
@@ -201,6 +219,30 @@ connectionGraphView.render();
 var answerList = new AnswerCollection({!! $answers->toJSON() !!});
 var answerListView = new AnswerListView({ collection: answerList });
 answerListView.render();
+
+function connectionCount(a) {
+	var temp = connectionList.where({initiator_id: a}).length;
+	return temp + connectionList.where({recipient_id: a}).length;
+}
+
+function getCost(type, recipient_id, intermediary_id) {
+	var cost = 0;
+	if (type == 'answer') {
+		cost = -5;
+	} else if (type == 'connection') {
+		cost = -1 * connectionCount(recipient_id);
+		if (intermediary_id) cost += 2;
+	} else if (type == 'accept') {
+		cost = 2;
+		if (intermediary_id) cost = 5;
+	} else if (type == 'reject') {
+		if (intermediary_id) cost = -2;
+	}
+	return {
+		cost: cost,
+		sign: (cost > 0) ? 'p' : (cost < 0 ? 'n' : 'z')
+	}
+}
 
 function connectionExists(a, b) {
 	if(connectionList.where({initiator_id: a, recipient_id: b}).length > 0) {

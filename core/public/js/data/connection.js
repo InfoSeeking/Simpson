@@ -52,6 +52,13 @@ var ConnectionListItemView = Backbone.View.extend({
 		this.layout = options.layout;
 		this.model.on('remove', this.remove, this);
 		this.model.on('change', this.render, this);
+
+		// TODO: I know this is inefficient, but time constraints.
+		// Ideally, scores should trigger render changes
+		// only for items which need it. 
+
+		// For live scoring:
+		connectionList.on('change', this.render, this);
 	},
 	onDelete: function(e) {
 		e.preventDefault();
@@ -60,7 +67,11 @@ var ConnectionListItemView = Backbone.View.extend({
 		modalEl.modal('show');
 	},
 	render: function() {
-		var html = this.template(this.model.toJSON());
+		var data = {
+			connection: this.model.toJSON(),
+			cost: getCost('answer', this.model.get('id'))
+		};
+		var html = this.template(data);
 		this.$el.html(html).addClass('user-connection');
 		return this;
 	},
@@ -204,7 +215,11 @@ var CurrentSelectedView = Backbone.View.extend({
 		});
 	},
 	render: function() {
-		this.$el.empty().html(this.template(this.model.toJSON()));
+		var data = {
+			user: this.model.toJSON(),
+			cost: getCost('connection', this.model.get('id'))
+		};
+		this.$el.empty().html(this.template(data));
 	},
 	remove: function() {
 		this.$el.empty();
@@ -243,7 +258,8 @@ var IntermediarySelectView = Backbone.View.extend({
 	template : _.template(
 		$('[data-template=select-intermediary]').html()),
 	events: {
-		'click .btn-request-connection': 'requestIntermediaryConnection'
+		'click .btn-request-connection': 'requestIntermediaryConnection',
+		'change [name=friends]': 'updateScore'
 	},
 	initialize: function(args) {},
 	remove: function() {
@@ -276,6 +292,7 @@ var IntermediarySelectView = Backbone.View.extend({
 		this.$el.find('#select-intermediary-modal').on('hidden.bs.modal', function() {
 			that.remove();
 		});
+		this.updateScore();
 	},
 	requestIntermediaryConnection: function(e) {
 		e.preventDefault();
@@ -298,5 +315,10 @@ var IntermediarySelectView = Backbone.View.extend({
 				MessageDisplay.displayIfError(json);
 			}
 		});
+	},
+	updateScore: function(e) {
+		var recipient_id = parseInt(this.$el.find('[name=friends] option:selected').val());
+		var cost = getCost('connection', recipient_id, this.model.get('id'));
+		this.$el.find('.cost').removeClass('cost-p cost-n cost-z').addClass('cost-' + cost.sign).html(cost.cost);
 	}
 });
