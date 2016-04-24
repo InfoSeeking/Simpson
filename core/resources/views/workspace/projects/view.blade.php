@@ -12,9 +12,8 @@ page-view
 @endsection('context')
 
 @section('navigation')
-<!-- <a href='/workspace/projects'><span class='fa fa-folder-open-o'></span> Projects</a>
-<span class='fa fa-angle-right'></span>
-<a href='/workspace/projects/{{ $project->id }}'>{{ $project->title }}</a> -->
+<a href='/workspace/instructions'>Instructions</a>
+<a href='/workspace/projects/{{$project->id}}'>Study</a>
 @endsection('navigation')
 
 @section('main-content')
@@ -41,7 +40,7 @@ page-view
 	</div>
 </div>
 <div class='col-md-6'>
-	<p>Current score <b id='user-score'>{{ $userScore }}</b></p>
+	<p>You have <b id='user-score'>{{ $userScore }}</b> NC Points and <b id='answer-score'>0</b> IC Points</p>
 
 	<h4>Question List</h4>
 	<div id='answer-list'></div>
@@ -220,6 +219,16 @@ var answerList = new AnswerCollection({!! $answers->toJSON() !!});
 var answerListView = new AnswerListView({ collection: answerList });
 answerListView.render();
 
+answerList.on('change', updateAnswerScore);
+updateAnswerScore();
+
+function updateAnswerScore() {
+	console.log('updating');
+	var total = answerList.where({answered: 1}).length;
+	total += answerList.where({answered: true}).length;
+	$('#answer-score').html(total);
+}
+
 function connectionCount(a) {
 	var temp = connectionList.where({initiator_id: a}).length;
 	return temp + connectionList.where({recipient_id: a}).length;
@@ -272,7 +281,6 @@ function canRequestConnection(to) {
 }
 
 function realtimeDataHandler(param) {
-	console.log(param);
 	if(param.dataType == 'requests') {
 		_.each(param.data, function(request) {
 			if (param.action == 'create') {

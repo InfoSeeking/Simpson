@@ -175,7 +175,7 @@ var ConnectionGraphView = Backbone.View.extend({
 			that.selectedUserView.render();
 		});
 		network.on('deselectNode', function(e) {
-			that.selectedUserView.remove();
+			if (that.selectedUserView) that.selectedUserView.remove();
 		})
 	},
 	render: function() {

@@ -217,4 +217,12 @@ class WorkspaceController extends Controller
             ]);
     }
 
+    public function showInstructions() {
+        $project = $this->projectService->getStudyProject();
+        return view('workspace.instructions', [
+            'user' => Auth::user(),
+            'project' => $project
+            ]);
+    }
+
 }

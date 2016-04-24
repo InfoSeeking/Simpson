@@ -12,8 +12,8 @@ use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
 class AuthController extends Controller
 {
-    protected $redirectPath = '/workspace/projects';
-    protected $redirectTo = '/workspace/projects';
+    protected $redirectPath = '/workspace/instructions';
+    protected $redirectTo = '/workspace/instructions';
     protected $redirectAfterLogout = '/auth/login';
     /*
     |--------------------------------------------------------------------------

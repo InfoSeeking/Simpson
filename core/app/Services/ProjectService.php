@@ -147,6 +147,19 @@ class ProjectService {
             ->get();
     }
 
+    public function getStudyProject() {
+        $project = DB::table('projects')
+            ->join('memberships', 'projects.id', '=', 'memberships.project_id')
+            ->where('projects.creator_id', '=', $this->user->id)
+            ->orWhere('memberships.user_id', '=', $this->user->id)
+            ->select('projects.*', 'memberships.level as level')
+            ->first();
+        if (!$project) {
+            throw new \Exception("No projects");
+        }
+        return $project;
+    }
+
     // User must be logged in.
     public function getMyProjects() {
         return Project::where('creator_id', $this->user->id)->get();

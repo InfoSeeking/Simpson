@@ -13,7 +13,7 @@ var RequestModel = Backbone.Model.extend({
 		} else if (this.get('recipient_id') == Config.get('userId')) {
 			this.set('direction', 'incoming');
 		} else {
-			throw 'Should never happen';
+			this.set('direction', 'n/a');
 		}
 	},
 	onError: function(model, response) {

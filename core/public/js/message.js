@@ -28,10 +28,14 @@ var MessageDisplay = (function() {
 
 	// className \in {danger, success, info}
 	function display(messages, className) {
-		messageArea.append(messageTemplate({
+		var message = $(messageTemplate({
 			items: messages,
 			className: className
 		}));
+		messageArea.append(message);
+		window.setTimeout(function() {
+			message.slideUp(150);
+		}, 10000);
 	}
 
 	return {
