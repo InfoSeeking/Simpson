@@ -320,5 +320,28 @@ function realtimeDataHandler(param) {
 
 Realtime.init(realtimeDataHandler);
 
+var resetTickTimer = (function(){
+	var tickTimer = window.setTimeout(tick, 5000);
+	function tick() {
+		console.log('tick');
+		$.ajax({
+			url: '/api/v1/tick',
+			method: 'post',
+			data: {
+				project_id: Config.get('projectId')
+			}
+		});
+		tickTimer = window.setTimeout(tick, 5000);
+	}
+
+	function resetTickTimer() {
+		window.clearTimeout(tickTimer);
+		tickTimer = window.setTimeout(tick, 5000);
+	}
+
+	return resetTickTimer;
+}());
+
+
 </script>
 @endsection('main-content')

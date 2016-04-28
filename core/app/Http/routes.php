@@ -85,4 +85,6 @@ Route::group(['middleware' => 'api.optional.auth'], function(){
 	Route::put('api/v1/projects/{project_id}/share', 'Api\ProjectController@updateShare');
 	Route::delete('api/v1/projects/{project_id}/share', 'Api\ProjectController@unshare');
 
+	Route::post('api/v1/tick', 'Api\TickController@tick');
+
 });
