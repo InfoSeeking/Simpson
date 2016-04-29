@@ -118,7 +118,7 @@ class CreateDemo extends Command
                     'user_id' => $user->id,
                     'answered' => false
                     ]);
-                if ($userIndex == $i % 21 || rand(0, 4) == 0) {
+                if ($userIndex == $i % 21 || rand(0, 3) == 0) {
                     $answer->answered = true;
                     $answer->save();
                 }
@@ -126,6 +126,6 @@ class CreateDemo extends Command
             }
         }
         // Actually give everyone except demo user all answers.
-        Answer::whereIn('user_id', $otherUserIds)->update(['answered' => true]);
+        // Answer::whereIn('user_id', $otherUserIds)->update(['answered' => true]);
     }
 }

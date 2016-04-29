@@ -15,6 +15,13 @@ var RequestModel = Backbone.Model.extend({
 		} else {
 			this.set('direction', 'n/a');
 		}
+
+		this.on('change', this.castNums, this);
+		this.castNums();
+	},
+	castNums: function() {
+		this.set('initiator_id', parseInt(this.get('initiator_id')));
+		this.set('recipient_id', parseInt(this.get('recipient_id')));
 	},
 	onError: function(model, response) {
 		MessageDisplay.displayIfError(response.responseJSON);
