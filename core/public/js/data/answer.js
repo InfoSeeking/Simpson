@@ -3,6 +3,8 @@ var AnswerModel = Backbone.Model.extend({
 		this.on('error', this.onError, this);
 		if (this.get('answered') === "1" || this.get('answered') === true || this.get('answered') === 1) {
 			this.set('isAnswered', true);
+		} else {
+			this.set('isAnswered', false);
 		}
 	},
 	onError: function(model, response) {
