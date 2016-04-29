@@ -223,8 +223,7 @@ answerList.on('change', updateAnswerScore);
 updateAnswerScore();
 
 function updateAnswerScore() {
-	var total = answerList.where({answered: 1}).length;
-	total += answerList.where({answered: true}).length;
+	var total = answerList.where({isAnswered: true}).length;
 	$('#answer-score').html(total);
 }
 
@@ -280,7 +279,7 @@ function canRequestConnection(to) {
 }
 
 function checkAllAnswered() {
-	if (answerList.where({'answered': 0}).length == 0) {
+	if (answerList.where({'isAnswered': false}).length == 0) {
 		window.setTimeout(function() {
 			window.location = '/workspace/end';
 		}, 1000);

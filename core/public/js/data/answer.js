@@ -1,6 +1,9 @@
 var AnswerModel = Backbone.Model.extend({
 	initialize: function() {
 		this.on('error', this.onError, this);
+		if (this.answered === "1" || this.answered === true) {
+			this.set('isAnswered', true);
+		}
 	},
 	onError: function(model, response) {
 		MessageDisplay.displayIfError(response.responseJSON);
@@ -40,7 +43,7 @@ var AnswerListItemView = Backbone.View.extend({
 	render: function() {
 		var html = this.template(this.model.toJSON());
 		this.$el.html(html).addClass('answer');
-		if (this.model.get('answered') === "1") {
+		if (this.model.get('isAnswered')) {
 			this.$el.addClass('answered');
 		} else {
 			this.$el.addClass('unanswered');
@@ -84,7 +87,7 @@ AskView = Backbone.View.extend({
 	template: _.template($('[data-template=select-question]').html()),
 	initialize: function() {},
 	render: function() {
-		var openQuestions = _.filter(answerList.toJSON(), function(q) {return !q.answered;});
+		var openQuestions = _.filter(answerList.toJSON(), function(q) {return !q.isAnswered;});
 		var askData = {
 			questions: openQuestions,
 			targetUser: this.model.toJSON()
