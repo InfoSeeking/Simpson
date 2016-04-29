@@ -21,7 +21,7 @@ page-view
 <div class='row'>
 <div class='col-md-6'>
 	@include('helpers.showAllMessages')
-	
+	<p>Select a user below to request connections and ask questions.</p>
 	<div id='graph-display'></div>
 	<div id='selected-user'></div>
 	
@@ -122,9 +122,9 @@ page-view
 <script type='text/template' data-template='selected-user'>
 	<p>Selecting <span class='name'><%= user.name %></span>.
 	<% if (canRequestConnection(user.id)) %>
-	<a href='#' class='request-connection' data-id=''>Request connection <span class='cost cost-<%= cost.sign %>'>(<%= cost.cost %>)</span></a>
+	<a href='#' class='btn btn-default request-connection' data-id=''>Request connection <span class='cost cost-<%= cost.sign %>'>(<%= cost.cost %>)</span></a>
 	<% else if (connectionExists(Config.get('userId'), user.id)) %>
-	You are connected. <a href='#'class='request-intermediary-connection'>Request connection with a friend.</a>
+	You are connected. <a href='#' class='btn btn-default request-intermediary-connection'>Request connection with a friend</a> <a href='#' class='btn btn-default ask-question'>Ask Question <span class='cost cost-<%= askcost.sign %>'>(<%= askcost.cost %>)</a>
 </script>
 
 <script type='text/template' data-template='request'>

@@ -24,7 +24,7 @@ Route::post('auth/demoLogin', 'Auth\AuthController@demoLogin');
 // Workspace pages.
 Route::group(['middleware' => 'auth'], function() {
 	// These pages do not make sense without a logged in user.
-	Route::get('/', 'WorkspaceController@showProjects');
+	Route::get('/', 'WorkspaceController@showInstructions');
 	Route::get('workspace', 'WorkspaceController@viewPanel');
 	Route::get('workspace/projects', 'WorkspaceController@showProjects');
 	Route::get('workspace/projects/create', 'WorkspaceController@showProjectCreate');

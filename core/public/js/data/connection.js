@@ -224,7 +224,8 @@ var CurrentSelectedView = Backbone.View.extend({
 	render: function() {
 		var data = {
 			user: this.model.toJSON(),
-			cost: getCost('connection', this.model.get('id'))
+			cost: getCost('connection', this.model.get('id')),
+			askcost: getCost('answer', this.model.get('id'))
 		};
 		this.$el.empty().html(this.template(data));
 	},

@@ -525,3 +525,9 @@ footer {
 	max-height: 220px;
 	overflow: auto;
 }
+
+#selected-user {
+	background: #EEE;
+	padding: 10px 10px 5px 10px;
+
+}
