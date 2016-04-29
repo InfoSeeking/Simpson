@@ -2,7 +2,7 @@ var AnswerModel = Backbone.Model.extend({
 	initialize: function() {
 		this.on('error', this.onError, this);
 		this.recomputeAnswered();
-		this.on('update', this.recomputeAnswered, this);
+		this.on('change', this.recomputeAnswered, this);
 	},
 	recomputeAnswered: function() {
 		if (this.get('answered') === "1" || this.get('answered') === true || this.get('answered') === 1) {
