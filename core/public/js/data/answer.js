@@ -1,7 +1,7 @@
 var AnswerModel = Backbone.Model.extend({
 	initialize: function() {
 		this.on('error', this.onError, this);
-		if (this.answered === "1" || this.answered === true) {
+		if (this.get('answered') === "1" || this.get('answered') === true || this.get('answered') === 1) {
 			this.set('isAnswered', true);
 		}
 	},
