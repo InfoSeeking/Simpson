@@ -33,6 +33,7 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::get('workspace/user/settings', 'WorkspaceController@showUserSettings');
 	Route::post('workspace/user/settings', 'WorkspaceController@updateUserSettings');
 	Route::get('workspace/instructions', 'WorkspaceController@showInstructions');
+	Route::get('workspace/end', 'WorkspaceController@showEnd');
 });
 
 Route::get('workspace/projects/{project_id}/bookmarks/{bookmark_id}',

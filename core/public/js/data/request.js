@@ -69,6 +69,7 @@ var RequestListItemView = Backbone.View.extend({
 		this.sendConnectionResponse('rejected');
 	},
 	sendConnectionResponse: function(state) {
+		resetTickTimer();
 		$.ajax({
 			url: '/api/v1/connection',
 			method: 'put',

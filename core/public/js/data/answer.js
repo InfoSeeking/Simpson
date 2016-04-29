@@ -40,7 +40,7 @@ var AnswerListItemView = Backbone.View.extend({
 	render: function() {
 		var html = this.template(this.model.toJSON());
 		this.$el.html(html).addClass('answer');
-		if (this.model.get('answered')) {
+		if (this.model.get('answered') === "1") {
 			this.$el.addClass('answered');
 		} else {
 			this.$el.addClass('unanswered');
@@ -104,6 +104,7 @@ AskView = Backbone.View.extend({
 		e.preventDefault();
 		// Prevent multiple submissions during fade-out with one-time lock.
 		if (this.locked) return;
+		resetTickTimer();
 		this.locked = true;
 		this.$el.find('#select-question-modal').modal('hide');
 		var answerName = this.$el.find('option:selected').html();

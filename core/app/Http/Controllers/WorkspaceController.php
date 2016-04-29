@@ -225,4 +225,12 @@ class WorkspaceController extends Controller
             ]);
     }
 
+    public function showEnd() {
+        $project = $this->projectService->getStudyProject();
+        return view('workspace.end', [
+            'user' => Auth::user(),
+            'project' => $project
+            ]);   
+    }
+
 }

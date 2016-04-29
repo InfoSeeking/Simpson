@@ -115,7 +115,8 @@ class CreateDemo extends Command
                 $answer = Answer::create([
                     'name' => ($i+1),
                     'project_id' => $project->id,
-                    'user_id' => $user->id
+                    'user_id' => $user->id,
+                    'answered' => false
                     ]);
                 if ($userIndex == $i % 21 || rand(0, 4) == 0) {
                     $answer->answered = true;

@@ -227,6 +227,7 @@ var CurrentSelectedView = Backbone.View.extend({
 	},
 	requestConnection: function(e) {
 		e.preventDefault();
+		resetTickTimer();
 		var recipientId = this.model.get('id');
 		$.ajax({
 			url: '/api/v1/requests',
@@ -296,6 +297,7 @@ var IntermediarySelectView = Backbone.View.extend({
 	},
 	requestIntermediaryConnection: function(e) {
 		e.preventDefault();
+		resetTickTimer();
 		this.$el.find('#select-intermediary-modal').modal('hide');
 		var recipientId = parseInt(this.$el.find('[name=friends] option:selected').val());
 		var intermediaryId = this.model.get('id');

@@ -223,7 +223,6 @@ answerList.on('change', updateAnswerScore);
 updateAnswerScore();
 
 function updateAnswerScore() {
-	console.log('updating');
 	var total = answerList.where({answered: 1}).length;
 	total += answerList.where({answered: true}).length;
 	$('#answer-score').html(total);
@@ -280,6 +279,14 @@ function canRequestConnection(to) {
 	return true;
 }
 
+function checkAllAnswered() {
+	if (answerList.where({'answered': 0}).length == 0) {
+		window.setTimeout(function() {
+			window.location = '/workspace/end';
+		}, 1000);
+	}
+}
+
 function realtimeDataHandler(param) {
 	if(param.dataType == 'requests') {
 		_.each(param.data, function(request) {
@@ -302,11 +309,8 @@ function realtimeDataHandler(param) {
 	} else if (param.dataType == 'answers') {
 		_.each(param.data, function(answer) {
 			if (answer.answered) {
-				// Unselect it if it is selected.
-				if (selectedAnswerId == answer.id) {
-					setSelectedAnswer(null);
-				}
 				answerList.get(answer.id).set(answer);
+				checkAllAnswered();
 			}
 		});
 	} else if (param.dataType == 'scores') {
@@ -322,21 +326,26 @@ Realtime.init(realtimeDataHandler);
 
 var resetTickTimer = (function(){
 	var tickTimer = window.setTimeout(tick, 5000);
+	var admissable = true;
 	function tick() {
 		console.log('tick');
-		$.ajax({
-			url: '/api/v1/tick',
-			method: 'post',
-			data: {
-				project_id: Config.get('projectId')
-			}
-		});
+		if (admissable) {
+			$.ajax({
+				url: '/api/v1/tick',
+				method: 'post',
+				data: {
+					project_id: Config.get('projectId')
+				}
+			});
+		} else {
+			admissable = true;
+		}
 		tickTimer = window.setTimeout(tick, 5000);
 	}
 
 	function resetTickTimer() {
-		window.clearTimeout(tickTimer);
-		tickTimer = window.setTimeout(tick, 5000);
+		console.log('reset');
+		admissable = false;
 	}
 
 	return resetTickTimer;
