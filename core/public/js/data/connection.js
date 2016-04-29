@@ -47,7 +47,8 @@ var ConnectionListItemView = Backbone.View.extend({
 	className: 'connection',
 	events: {
 		'click .delete': 'onDelete',
-		'click .btn-ask': 'onClickAsk'
+		'click .btn-ask': 'onClickAsk',
+		'click .btn-intermediary-connection': 'showRequestIntermediaryConnectionModal'
 	},
 	template: _.template($('[data-template=user_connection]').html()),
 	attributes: function() {
@@ -86,7 +87,15 @@ var ConnectionListItemView = Backbone.View.extend({
 		e.preventDefault();
 		var otherUser = userList.get(this.model.get('other_id'));
 		(new AskView({model: otherUser})).render();
-	}
+	},
+	showRequestIntermediaryConnectionModal: function(e) {
+		e.preventDefault();
+		// Show modal window with current connections.
+		var otherUser = userList.get(this.model.get('other_id'));
+		new IntermediarySelectView({
+			model: otherUser
+		}).render();
+	},
 });
 
 // Only shows connections with current user.
@@ -210,7 +219,8 @@ var CurrentSelectedView = Backbone.View.extend({
 	template: _.template($('[data-template=selected-user]').html()),
 	events: {
 		'click .request-connection': 'requestConnection',
-		'click .request-intermediary-connection': 'showRequestIntermediaryConnectionModal'
+		'click .request-intermediary-connection': 'showRequestIntermediaryConnectionModal',
+		'click .ask-question': 'showAskQuestionModal'
 	},
 	initialize: function(args) {
 		var that = this;
@@ -257,6 +267,12 @@ var CurrentSelectedView = Backbone.View.extend({
 		e.preventDefault();
 		// Show modal window with current connections.
 		new IntermediarySelectView({
+			model: this.model
+		}).render();
+	},
+	showAskQuestionModal: function(e) {
+		e.preventDefault();
+		new AskView({
 			model: this.model
 		}).render();
 	}

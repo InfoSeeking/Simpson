@@ -164,6 +164,7 @@ Awaiting response.
 <script type='text/template' data-template='user_connection'>
 	<td>You are connected to <span class='connected-user'><%= connection.other_name %></span>.</td>
 	<td><a class='btn-ask btn btn-default'>Ask Question <span class='cost cost-<%= cost.sign %>'>(<%= cost.cost %>)</span></a></td>
+	<td><a class='btn-intermediary-connection btn btn-default'>Request Connection with Friend</a></td>
 </script>
 
 <script type='text/template' data-template='answer'>
