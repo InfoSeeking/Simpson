@@ -92,7 +92,7 @@ class RequestService {
 	public function create($args) {
 		$validator = Validator::make($args, [
 			'type' => 'required|string',
-			'recipient_id' => 'required|integer|exists:users,id',
+			'recipient_id' => 'sometimes|integer|exists:users,id',
 			'intermediary_id' => 'sometimes|integer|exists:users,id',
 			'project_id' => 'required|integer|exists:projects,id',
 			'answer_name' => 'sometimes|string|exists:answers,name',
@@ -106,24 +106,25 @@ class RequestService {
 
 		$request = new Request($args);
 		$request->initiator_id = $this->user->id;
-		$request->recipient_id = intval($args['recipient_id']);
 		$request->project_id = intval($args['project_id']);
 		$request->state = 'open';
+		if (array_key_exists('recipient_id', $args))
+			$request->recipient_id = intval($args['recipient_id']);
 
 		if ($request->initiator_id == $request->recipient_id) {
 			return Status::fromError('Cannot send request to self');
 		}
 
-		if ($request->type == 'answer') {
+		// Update scores.
+		if(!$this->scoreService->applyOpenRequestScore($request)) {
+			return Status::fromError('You do not have enough score to make request');
+		}
+
+		if ($request->type == 'answer' || $request->type == 'answer_all') {
 			$request->answer_id = $args['answer_name'];
 			// This gets an immediate response.
 			$wasAnswered = $this->answerService->handle($request);
 			$request->state = $wasAnswered ? 'answered' : 'not_answered';
-		}
-
-		// Update scores.
-		if(!$this->scoreService->applyOpenRequestScore($request)) {
-			return Status::fromError('You do not have enough score to make request');
 		}
 
 		$request->save();

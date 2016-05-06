@@ -1,24 +1,27 @@
 var RequestModel = Backbone.Model.extend({
 	initialize: function() {
 		this.on('error', this.onError, this);
-		// Attempt to set user name if available.
-		var initiator = userList.get(this.get('initiator_id'));
-		this.set('initiator_name', initiator.get('name'));
 
-		var recipient = userList.get(this.get('recipient_id'));
-		this.set('recipient_name', recipient.get('name'));
+		if (this.get('type') == 'connection') {
+			// Attempt to set user name if available.
+			var initiator = userList.get(this.get('initiator_id'));
+			this.set('initiator_name', initiator.get('name'));
 
-		if (this.get('initiator_id') == Config.get('userId')) {
-			this.set('direction', 'outgoing');
-		} else if (this.get('recipient_id') == Config.get('userId')) {
-			this.set('direction', 'incoming');
-			this.set('timeLeft', 30);
-		} else {
-			this.set('direction', 'n/a');
+			var recipient = userList.get(this.get('recipient_id'));
+			this.set('recipient_name', recipient.get('name'));
+
+			if (this.get('initiator_id') == Config.get('userId')) {
+				this.set('direction', 'outgoing');
+			} else if (this.get('recipient_id') == Config.get('userId')) {
+				this.set('direction', 'incoming');
+				this.set('timeLeft', 30);
+			} else {
+				this.set('direction', 'n/a');
+			}
+
+			this.on('change', this.castNums, this);
+			this.castNums();
 		}
-
-		this.on('change', this.castNums, this);
-		this.castNums();
 	},
 	castNums: function() {
 		this.set('initiator_id', parseInt(this.get('initiator_id')));
@@ -140,6 +143,7 @@ var IncomingRequestListView = Backbone.View.extend({
 	add: function(model) {
 		// Filter by only incoming requests.
 		if (model.get('recipient_id') != Config.get('userId')) return;
+		if (model.get('type') != 'connection') return;
 		var item = new RequestListItemView({model: model});
 		item.render();
 		this.$el.append(item.$el);
@@ -156,6 +160,7 @@ var OutgoingRequestListView = IncomingRequestListView.extend({
 	add: function(model) {
 		// Filter by outgoing requests.
 		if (model.get('initiator_id') != Config.get('userId')) return;
+		if (model.get('type') != 'connection') return;
 		var item = new RequestListItemView({model: model});
 		item.render();
 		this.$el.append(item.$el);

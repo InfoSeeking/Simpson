@@ -46,8 +46,11 @@ page-view
 	<div id='answer-list'></div>
 	<p class='selected-answer'>Selecting question <span></span>. Select a user below to ask.</p>
 
+	
+
 	<h4>Users Connected to You</h4>
 	<table class='table table-condensed table-hover' id='user-connection-list'></table>
+	<div id='ask-all-container' style='text-align: center; padding-bottom: 20px;'></div>
 
 	<h4>Incoming Connection Requests</h4>
 	<div class='scrollpane'>
@@ -174,7 +177,11 @@ Awaiting response.
 <span data-id='<%= id %>' title="<% if (answered) { %> Answered <% } else { %> Unanswered <% } %>" >
 <%= name %>
 </a>
+</script>
 
+<script type='text/template' data-template='ask-all'>
+<% if (count > 2) %>
+<a href='#' class='ask-all-btn btn btn-default'>Ask all connected users a Question <span class='cost cost-<%= cost.sign %>'>(<%= cost.cost %>)</span></a>
 </script>
 
 <script src='/js/realtime.js'></script>
@@ -248,6 +255,8 @@ function getCost(type, recipient_id, intermediary_id) {
 		if (intermediary_id) cost = 5;
 	} else if (type == 'reject') {
 		if (intermediary_id) cost = -2;
+	} else if (type == 'ask-all') {
+		cost = -5 * connectionCount(Config.get('userId')) + 5;
 	}
 	return {
 		cost: cost,
@@ -353,6 +362,8 @@ var resetTickTimer = (function(){
 
 	return resetTickTimer;
 }());
+
+new AskAllButtonView().render();
 
 
 </script>

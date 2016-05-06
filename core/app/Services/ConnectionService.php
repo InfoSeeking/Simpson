@@ -36,6 +36,13 @@ class ConnectionService {
 		$connections = Connection::where('project_id', $args['project_id']);
 		return Status::fromResult($connections->get());
 	}
+
+	public function getOtherIds() {
+		$a = Connection::where('initiator_id', $this->user->id)->get()->pluck('recipient_id')->toArray();
+		$b = Connection::where('recipient_id', $this->user->id)->get()->pluck('initiator_id')->toArray();
+		$otherIds = array_merge($a, $b);
+		return $otherIds;
+	}
 	
 	// if initiator_id is not passed, current user is assumed.
 	public function create($args) {

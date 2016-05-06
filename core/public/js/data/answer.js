@@ -85,18 +85,21 @@ var AnswerListView = Backbone.View.extend({
 	}
 });
 
-AskView = Backbone.View.extend({
+var AskView = Backbone.View.extend({
 	el: '#modal-container',
 	events: {
 		'click .btn-ask': 'askQuestion'
 	},
 	template: _.template($('[data-template=select-question]').html()),
-	initialize: function() {},
+	initialize: function(options) {
+		if (options.hasOwnProperty('askAll') && options.askAll) {
+			this.askAll = true;
+		}
+	},
 	render: function() {
 		var openQuestions = _.filter(answerList.toJSON(), function(q) {return !q.isAnswered;});
 		var askData = {
-			questions: openQuestions,
-			targetUser: this.model.toJSON()
+			questions: openQuestions
 		};
 		var that = this;
 		this.$el.html(this.template(askData));
@@ -117,20 +120,35 @@ AskView = Backbone.View.extend({
 		this.locked = true;
 		this.$el.find('#select-question-modal').modal('hide');
 		var answerName = this.$el.find('option:selected').html();
+
+		var data = {
+			project_id: parseInt(Config.get('projectId')),
+			ask_all: this.askAll,
+			type: 'answer',
+			answer_name: answerName,
+		};
+
+		if (!this.askAll) {
+			data.recipient_id = parseInt(this.model.get('id'));
+		} else {
+			data.type = 'answer_all';
+		}
+
+		var that = this;
+
 		$.ajax({
 			url: '/api/v1/requests',
 			method: 'post',
-			data: {
-				project_id: parseInt(Config.get('projectId')),
-				recipient_id: parseInt(this.model.get('id')),
-				type: 'answer',
-				answer_name: answerName,
-			},
+			data: data,
 			success: function(resp) {
 				if (resp.result.state == "answered") {
 					MessageDisplay.display(['Answer recieved!'], 'success');
 				} else {
-					MessageDisplay.display(['User did not have the answer'], 'danger');
+					if (that.askAll) {
+						MessageDisplay.display(['None of your connections had the answer'], 'danger');	
+					} else {
+						MessageDisplay.display(['User did not have the answer'], 'danger');
+					}
 				}
 			},
 			error: function(xhr) {
@@ -139,4 +157,28 @@ AskView = Backbone.View.extend({
 			}
 		});
 	}
-})
+});
+
+var AskAllButtonView = Backbone.View.extend({
+	el: '#ask-all-container',
+	template: _.template($('[data-template=ask-all]').html()),
+	events: {
+		'click a': 'onClick'
+	},
+	initialize: function() {
+		connectionList.on('update', this.render, this);
+	},
+	render: function () {
+		var data = {
+			cost: getCost('ask-all'),
+			count: connectionCount(Config.get('userId'))
+		};
+		this.$el.html(this.template(data));
+	},
+	onClick: function(e) {
+		e.preventDefault();
+		new AskView({
+			askAll: true
+		}).render();
+	}
+});

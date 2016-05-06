@@ -8,11 +8,14 @@ use App\Models\Request;
 use App\Models\User;
 use App\Models\Score;
 use App\Services\RealtimeService;
+use App\Services\ConnectionService;
 
 class ScoreService {
-	public function __construct(RealtimeService $realtimeService) {
+	public function __construct(RealtimeService $realtimeService,
+		ConnectionService $connectionService) {
 		$this->user = Auth::user();
 		$this->realtimeService = $realtimeService;
+		$this->connectionService = $connectionService;
 	}
 
 	// Returns false if this would leave user with a negative score.
@@ -37,16 +40,17 @@ class ScoreService {
 		$type = $request->type;
 		$state = $request->state;
 
-		// Get connection count of recipient.
-		$numConnections = Connection::where('initiator_id', $recipient->id)
-			->orWhere('recipient_id', $recipient->id)
-			->count();
-
 		if ($type == 'connection') {
+			// Get connection count of recipient.
+			$numConnections = Connection::where('initiator_id', $recipient->id)
+				->orWhere('recipient_id', $recipient->id)
+				->count();
 			$scoreChange = -1 * $numConnections;
 			if ($intermediary != null) $scoreChange += 2;
 		} else if ($type == 'answer') {
 			$scoreChange = -5;
+		} else if ($type == 'answer_all') {
+			$scoreChange = -5 * count($this->connectionService->getOtherIds()) + 5;
 		}
 
 		return $this->applyScoreChange($scoreChange, $request->project_id);
@@ -64,7 +68,7 @@ class ScoreService {
 			->count();
 
 		$scoreChange = 0;
-		
+
 		if ($state == 'accepted') {
 			$scoreChange = 2;
 			if ($intermediary != null) $scoreChange = 5;

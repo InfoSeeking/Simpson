@@ -11,16 +11,19 @@ use App\Models\Membership;
 use App\Models\User;
 use App\Services\MembershipService;
 use App\Services\RealtimeService;
+use App\Services\ConnectionService;
 use App\Utilities\Status;
 use App\Utilities\StatusCodes;
 
 class AnswerService {
 	public function __construct(
 		MembershipService $memberService,
-		RealtimeService $realtimeService
+		RealtimeService $realtimeService,
+		ConnectionService $connectionService
 		) {
 		$this->memberService = $memberService;
 		$this->realtimeService = $realtimeService;
+		$this->connectionService = $connectionService;
 		$this->user = Auth::user();
 	}
 
@@ -41,12 +44,22 @@ class AnswerService {
 	}
 	
 	public function handle(Request $request) {
-		if (!$request->type == 'answer') throw new \InvalidArgumentException();
-		$answer = Answer::where('user_id', $request->recipient_id)
-			->where('project_id', $request->project_id)
-			->where('name', $request->answer_id) // request->answer_id <==> answer->name...
-			->first();
-		if ($answer->answered) {
+		$answer = Answer::where('project_id', $request->project_id)
+			->where('name', $request->answer_id)
+			->where('answered', true);
+
+		if ($request->type == 'answer') {
+			$answer = $answer->where('user_id', $request->recipient_id);
+		} else if ($request->type == 'answer_all') {
+			// Get id list of other users who we are connected to directly.
+			$otherIds = $this->connectionService->getOtherIds();
+			$answer = $answer->whereIn('user_id', $otherIds);
+		} else {
+			throw new \IllegalArgumentException('Invalid request type');
+		}
+			
+		$hasAnswer = !is_null($answer->first());
+		if ($hasAnswer) {
 			// Check if this user already has this answer.
 			$existingAnswer = Answer::where('user_id', $this->user->id)
 				->where('project_id', $request->project_id)
