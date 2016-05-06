@@ -63,6 +63,8 @@ class ScoreService {
 			->orWhere('recipient_id', $recipient->id)
 			->count();
 
+		$scoreChange = 0;
+		
 		if ($state == 'accepted') {
 			$scoreChange = 2;
 			if ($intermediary != null) $scoreChange = 5;

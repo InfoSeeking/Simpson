@@ -143,6 +143,9 @@ You rejected.
 &nbsp;
 <a class='connection-reject btn btn-default'>Reject <span class='cost cost-<%= rejectCost.sign %>'>(<%= rejectCost.cost %>)</span></a>
 </td>
+<td>
+Time left: <span class='time-left'><%= request.timeLeft %></span>
+</td>
 
 <% } else if (request.type=='connection' && request.direction == 'outgoing') { %>
 <td>

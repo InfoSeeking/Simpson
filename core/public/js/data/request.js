@@ -12,6 +12,7 @@ var RequestModel = Backbone.Model.extend({
 			this.set('direction', 'outgoing');
 		} else if (this.get('recipient_id') == Config.get('userId')) {
 			this.set('direction', 'incoming');
+			this.set('timeLeft', 30);
 		} else {
 			this.set('direction', 'n/a');
 		}
@@ -59,6 +60,24 @@ var RequestListItemView = Backbone.View.extend({
 	initialize: function (options) {
 		this.model.on('remove', this.remove, this);
 		this.model.on('change', this.render, this);
+		if (this.model.get('direction') == 'incoming' && this.model.get('state') == 'open') {
+			var that = this;
+			window.setTimeout(function() {that.checkClock();}, 1000);
+		}
+	},
+	checkClock: function() {
+		var that = this;
+		if (this.model.get('state') != 'open') return;
+		var timeLeft = this.model.get('timeLeft');
+		timeLeft--;
+		if (timeLeft <= 0) {
+			// Auto reject on timeout.
+			this.onReject();
+		} else {
+			window.setTimeout(function() {that.checkClock();}, 1000);
+		}
+		this.model.set('timeLeft', timeLeft);
+		this.render();
 	},
 	onDelete: function(e) {
 		console.log('delete');
@@ -72,7 +91,7 @@ var RequestListItemView = Backbone.View.extend({
 		this.sendConnectionResponse('accepted');
 	},
 	onReject: function(e) {
-		e.preventDefault();
+		if (e) e.preventDefault();
 		this.sendConnectionResponse('rejected');
 	},
 	sendConnectionResponse: function(state) {
