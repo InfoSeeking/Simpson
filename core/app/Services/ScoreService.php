@@ -15,19 +15,13 @@ class ScoreService {
 		$this->realtimeService = $realtimeService;
 	}
 
-	// At first, let's hard code.
-	// private function evalFormula($formula, $args) {
-	// 	extract($args);
-	// 	$value = 0;
-	// 	eval("$value = " . $formula . ";");
-	// 	return $value;
-	// }
-
+	// Returns false if this would leave user with a negative score.
 	private function applyScoreChange($scoreChange, $projectId) {
 		$score = Score::firstOrCreate([
 				'user_id' => $this->user->id,
 				'project_id' => $projectId]);
 		$score->score += $scoreChange;
+		if ($score->score < 0) return false;
 		$score->save();
 
 		$this->realtimeService
@@ -37,8 +31,7 @@ class ScoreService {
 		return $score->score;
 	}
 
-	// This is called when a request state changes (including when it opens).
-	public function applyRequestScore(Request $request) {
+	public function applyOpenRequestScore(Request $request) {
 		$recipient = User::find($request->recipient_id);
 		$intermediary = ($request->intermediary_id === null) ? null : User::find($request->intermediary_id);
 		$type = $request->type;
@@ -49,25 +42,33 @@ class ScoreService {
 			->orWhere('recipient_id', $recipient->id)
 			->count();
 
-		$scoreChange = 0;
+		if ($type == 'connection') {
+			$scoreChange = -1 * $numConnections;
+			if ($intermediary != null) $scoreChange += 2;
+		} else if ($type == 'answer') {
+			$scoreChange = -5;
+		}
 
-		switch ($state) {
-			case 'open':
-				if ($type == 'connection') {
-					$scoreChange = -1 * $numConnections;
-					if ($intermediary != null) $scoreChange += 2;
-				} else if ($type == 'answer') {
-					$scoreChange = -5;
-				}
-				break;
-			case 'accepted':
-				$scoreChange = 2;
-				if ($intermediary != null) $scoreChange = 5;
-				break;
-			case 'rejected':
-				$scoreChange = 0;
-				if ($intermediary != null) $scoreChange = -2;
-				break;
+		return $this->applyScoreChange($scoreChange, $request->project_id);
+	}
+
+	public function applyUpdateRequestScore(Request $request) {
+		$recipient = User::find($request->recipient_id);
+		$intermediary = ($request->intermediary_id === null) ? null : User::find($request->intermediary_id);
+		$type = $request->type;
+		$state = $request->state;
+
+		// Get connection count of recipient.
+		$numConnections = Connection::where('initiator_id', $recipient->id)
+			->orWhere('recipient_id', $recipient->id)
+			->count();
+
+		if ($state == 'accepted') {
+			$scoreChange = 2;
+			if ($intermediary != null) $scoreChange = 5;
+		} else if ($type == 'rejected') {
+			$scoreChange = 0;
+			if ($intermediary != null) $scoreChange = -2;
 		}
 
 		return $this->applyScoreChange($scoreChange, $request->project_id);

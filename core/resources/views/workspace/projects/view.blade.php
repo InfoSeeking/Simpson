@@ -325,7 +325,7 @@ function realtimeDataHandler(param) {
 Realtime.init(realtimeDataHandler);
 
 var resetTickTimer = (function(){
-	var tickTimer = window.setTimeout(tick, 5000);
+	var tickTimer = window.setTimeout(tick, 20000);
 	var admissable = true;
 	function tick() {
 		console.log('tick');
@@ -340,7 +340,7 @@ var resetTickTimer = (function(){
 		} else {
 			admissable = true;
 		}
-		tickTimer = window.setTimeout(tick, 5000);
+		tickTimer = window.setTimeout(tick, 20000);
 	}
 
 	function resetTickTimer() {

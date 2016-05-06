@@ -11,6 +11,7 @@ use App\Models\Request;
 use App\Services\ConnectionService;
 use App\Services\RequestService;
 use App\Models\User;
+use App\Models\Score;
 use Faker;
 
 class CreateDemo extends Command
@@ -111,6 +112,12 @@ class CreateDemo extends Command
         array_push($users, $demoUser);
         $userIndex = 0;
         foreach ($users as $user) {
+            Score::create([
+                'project_id' => $project->id,
+                'score' => 1000,
+                'user_id' => $user->id
+                ]);
+
             for ($i = 0; $i < 40; $i++) {
                 $answer = Answer::create([
                     'name' => ($i+1),

@@ -109,24 +109,24 @@ class RequestService {
 		$request->recipient_id = intval($args['recipient_id']);
 		$request->project_id = intval($args['project_id']);
 		$request->state = 'open';
-		$request->save();
 
 		if ($request->initiator_id == $request->recipient_id) {
 			return Status::fromError('Cannot send request to self');
 		}
-
-		// Update scores.
-		$this->scoreService->applyRequestScore($request);
 
 		if ($request->type == 'answer') {
 			$request->answer_id = $args['answer_name'];
 			// This gets an immediate response.
 			$wasAnswered = $this->answerService->handle($request);
 			$request->state = $wasAnswered ? 'answered' : 'not_answered';
-			$request->save();
-			// Update scores.
-			$this->scoreService->applyRequestScore($request);
 		}
+
+		// Update scores.
+		if(!$this->scoreService->applyOpenRequestScore($request)) {
+			return Status::fromError('You do not have enough score to make request');
+		}
+
+		$request->save();
 
 		$this->realtimeService
 			->withModel($request)
@@ -198,8 +198,13 @@ class RequestService {
 		}
 
 		$request->state = $args['state'];
+		
+		if(!$this->scoreService->applyUpdateRequestScore($request)) {
+			return Status::fromError(
+				'You do not have enough score to perform this action');
+		}
+
 		$request->save();
-		$this->scoreService->applyRequestScore($request);
 
 		$this->realtimeService
 			->withModel($request)
