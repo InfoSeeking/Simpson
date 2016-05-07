@@ -40,7 +40,7 @@ page-view
 	</div>
 </div>
 <div class='col-md-6'>
-	<p>You have <b id='user-score'>{{ $userScore }}</b> NC Points and <b id='answer-score'>0</b> IC Points</p>
+	<p>You have <b id='user-score'>{{ $userScore }}</b> NC Points and <b id='answer-score'>0</b> IC Points. You have <b id='time-left'>{{ $timeLeft }}</b> seconds left.</p>
 
 	<h4>Question List</h4>
 	<div id='answer-list'></div>
@@ -363,7 +363,19 @@ var resetTickTimer = (function(){
 	return resetTickTimer;
 }());
 
-new AskAllButtonView().render();
+(function() {
+	new AskAllButtonView().render();
+	var countdownEl = $("#time-left")
+	var timeLeft = {{ $timeLeft }};
+	function countdown() {
+		timeLeft--;
+		if (timeLeft < 0) timeLeft = 0;
+		if (timeLeft == 0) window.location = "/workspace/end";
+		countdownEl.html(timeLeft);
+	}
+	window.setInterval(countdown, 1000);
+}());
+
 
 
 </script>

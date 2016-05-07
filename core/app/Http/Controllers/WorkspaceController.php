@@ -103,6 +103,12 @@ class WorkspaceController extends Controller
         $answersStatus = $this->answerService->getMultiple(['project_id' => $projectId]);
         if (!$answersStatus->isOK()) return $answersStatus->asRedirect('workspace');
 
+        $timeLeft = $this->projectService->getTimeLeft($projectId);
+
+        if ($timeLeft == 0) {
+            return redirect('/workspace/end');
+        }
+
         return view('workspace.projects.view', [
             'project' => $projectStatus->getResult(),
             'permission' => $permissionStatus->getResult(),
@@ -111,7 +117,8 @@ class WorkspaceController extends Controller
             'sharedUsers' => $sharedUsersStatus->getResult(),
             'requests' => $requestsStatus->getResult(),
             'connections' => $connectionsStatus->getResult(),
-            'answers' => $answersStatus->getResult()
+            'answers' => $answersStatus->getResult(),
+            'timeLeft' => $timeLeft
             ]);
     }
 

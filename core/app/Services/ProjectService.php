@@ -21,6 +21,20 @@ class ProjectService {
         $this->memberService = $memberService;
     }
 
+    // Returns number of seconds left or 0, never negative.
+    public function getTimeLeft($projectId) {
+        $membership = Membership::where('project_id', $projectId)->where('user_id', $this->user->id)->first();
+        if (is_null($membership->time_started)) {
+            // Start it
+            $membership->time_started = time();
+            $membership->save();
+        }
+
+        $endTime = $membership->time_started + (60 * 60);
+        $timeLeft = ($endTime - time());
+        return max(0,  $timeLeft);
+    }
+
 	public function create($args){
         $validator = Validator::make($args, [
             'title' => 'required',

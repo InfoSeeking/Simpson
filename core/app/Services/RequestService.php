@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\AnswerService;
 use App\Services\MembershipService;
 use App\Services\ConnectionService;
+use App\Services\ProjectService;
 use App\Services\RealtimeService;
 use App\Services\ScoreService;
 use App\Utilities\Status;
@@ -23,13 +24,15 @@ class RequestService {
 		RealtimeService $realtimeService,
 		ConnectionService $connectionService,
 		AnswerService $answerService,
-		ScoreService $scoreService
+		ScoreService $scoreService,
+		ProjectService $projectService
 		) {
 		$this->memberService = $memberService;
 		$this->realtimeService = $realtimeService;
 		$this->connectionService = $connectionService;
 		$this->answerService = $answerService;
 		$this->scoreService = $scoreService;
+		$this->projectService = $projectService;
 		$this->user = Auth::user();
 	}
 	
@@ -104,9 +107,14 @@ class RequestService {
 		$memberStatus = $this->memberService->checkPermission($args['project_id'], 'w', $this->user);
 		if (!$memberStatus->isOK()) return $memberStatus;
 
+		$projectId = intval($args['project_id']);
+
+		if ($this->projectService->getTimeLeft($projectId) == 0)
+			return Status::fromError('Project time is up');
+
 		$request = new Request($args);
 		$request->initiator_id = $this->user->id;
-		$request->project_id = intval($args['project_id']);
+		$request->project_id = $projectId;
 		$request->state = 'open';
 		if (array_key_exists('recipient_id', $args))
 			$request->recipient_id = intval($args['recipient_id']);
@@ -183,6 +191,9 @@ class RequestService {
 
 		if ($request->state != 'open')
 			return Status::fromError('Cannot update closed request');
+		
+		if ($this->projectService->getTimeLeft($request->project_id) == 0)
+			return Status::fromError('Project time is up');
 
 		if ($args['state'] == 'accepted') {
 			$connectionStatus = $this->connectionService->create([

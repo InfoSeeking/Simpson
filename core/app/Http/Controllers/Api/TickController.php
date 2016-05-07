@@ -14,7 +14,7 @@ use App\Utilities\Status;
 use App\Utilities\ApiResponse;
 use App\Services\RealtimeService;
 
-// Should be called by the front-end every five seconds.
+// Should be called by the front-end every twenty seconds.
 class TickController extends Controller
 {
     public function __construct(RealtimeService $realtimeService) {
@@ -31,8 +31,7 @@ class TickController extends Controller
         $user = Auth::user();
         if (!$user) return ApiResponse::fromStatus(Status::fromError('Not logged in'));
 
-        // TODO: verify the user has not performed any actions in last five seconds.
-        
+        // TODO: verify the user has not performed any actions in last twenty seconds.     
         $score = Score::firstOrCreate([
             'user_id' => $user->id,
             'project_id' => $projectId]);
