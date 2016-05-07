@@ -32,7 +32,9 @@ var MessageDisplay = (function() {
 			items: messages,
 			className: className
 		}));
+		messageArea.empty();
 		messageArea.append(message);
+		message.hide().slideDown(150);
 		window.setTimeout(function() {
 			message.slideUp(150);
 		}, 10000);

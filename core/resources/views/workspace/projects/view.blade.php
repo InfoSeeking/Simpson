@@ -248,12 +248,13 @@ function getCost(type, recipient_id, intermediary_id) {
 	if (type == 'answer') {
 		cost = -5;
 	} else if (type == 'connection') {
-		cost = -1 * connectionCount(recipient_id);
-		if (intermediary_id) cost += 2;
+		cost = -1 * connectionCount(recipient_id) - 2;
+		if (intermediary_id) cost += 4;
 	} else if (type == 'accept') {
 		cost = 2;
 		if (intermediary_id) cost = 5;
 	} else if (type == 'reject') {
+		cost = -1;
 		if (intermediary_id) cost = -2;
 	} else if (type == 'ask-all') {
 		cost = -5 * connectionCount(Config.get('userId')) + 5;
@@ -282,10 +283,10 @@ function canRequestConnection(to) {
 	// Check if connection exists.
 	if (connectionExists(userId, to)) return false;
 	// Check if request already in progress from either side.
-	if (requestList.where({initiator_id: userId, recipient_id: to, type: 'connection'}).length > 0) {
+	if (requestList.where({initiator_id: userId, recipient_id: to, type: 'connection', state: 'open'}).length > 0) {
 		return false;
 	}
-	if (requestList.where({initiator_id: userId, recipient_id: to, type: 'connection'}).length > 0) {
+	if (requestList.where({initiator_id: userId, recipient_id: to, type: 'connection', state: 'open'}).length > 0) {
 		return false;
 	}
 	return true;

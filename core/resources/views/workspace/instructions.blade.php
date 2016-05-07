@@ -16,17 +16,23 @@
 
 <h4>Action Costs/Benefits</h4>
 <table class='table table-condensed table-striped'>
-<tr><td>Requesting a connection with someone new</td><td class='cost cost-n'>-L  &nbsp;*</td></tr>
-<tr><td>Requesting a connection with a friend-of-a-friend</td><td class='cost cost-n'>-L<span style='color: #4DB339'>+2</span> &nbsp;*</td></tr>
-<tr><td>Accepting a connection from someone new</td><td class='cost cost-p'>2</td></tr>
-<tr><td>Accepting a connection from a friend-of-a-friend</td><td class='cost cost-p'>5</td></tr>
-<tr><td>Refusing a connection from someone new</td><td class='cost cost-z'>0</td></tr>
-<tr><td>Refusing a connection from a friend-of-a-friend</td><td class='cost cost-n'>-2</td></tr>
-<tr><td>Asking for an answer from someone</td><td class='cost cost-n'>-5</td></tr>
-<tr><td>Doing nothing for a twenty second period (i.e. lurking)</td><td class='cost cost-p'>1</td></tr>
+<thead>
+<tr><th>Action</th><th>Your score change</th><th>Their score change</th></tr>
+</thead>
+
+<tr><td>Requesting a connection with someone new</td><td class='cost cost-n'>-L  &nbsp;*</td><td>0</td></tr>
+<tr><td>Requesting a connection with a friend-of-a-friend</td><td class='cost cost-n'>-L<span style='color: #4DB339'>+2</span> &nbsp;*</td><td>0</td></tr>
+<tr><td>Accepting a connection from someone new</td><td class='cost cost-p'>2</td><td class='cost cost-p'>10</td></tr>
+<tr><td>Accepting a connection from a friend-of-a-friend</td><td class='cost cost-p'>5</td><td class='cost cost-p'>10</td></tr>
+<tr><td>Refusing a connection from someone new</td><td class='cost cost-n'>-1</td><td class='cost cost-n'>-10</td></tr>
+<tr><td>Refusing a connection from a friend-of-a-friend</td><td class='cost cost-n'>-2</td><td class='cost cost-n'>-10</td></tr>
+<tr><td>Asking for an answer from someone</td><td class='cost cost-n'>-5</td><td class='cost cost-z'>0</td></tr>
+<tr><td>Asking for an answer from all friends</td><td class='cost cost-n'>-5N<span style='color: #4DB339'>+5</span>&nbsp;**</td><td class='cost cost-z'>0</td></tr>
+<tr><td>Doing nothing for a twenty second period (i.e. lurking)</td><td class='cost cost-p'>1</td><td>not applicable</td></tr>
 </table>
 <p>
-	<small>*L is equal to the number of connections that person has.</small>
+	<small>*L is the number of connections that person has.</small>
+	<small>**N is the number of connections you have.</small>
 </p>
 
 <p>You can return to these instructions at any time by clicking the <i>INSTRUCTIONS</i> link at the top of the page.</p>

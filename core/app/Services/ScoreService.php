@@ -19,9 +19,10 @@ class ScoreService {
 	}
 
 	// Returns false if this would leave user with a negative score.
-	private function applyScoreChange($scoreChange, $projectId) {
+	private function applyScoreChange($scoreChange, $projectId, $userId=null) {
+		if(is_null($userId)) $userId = $this->user->id;
 		$score = Score::firstOrCreate([
-				'user_id' => $this->user->id,
+				'user_id' => $userId,
 				'project_id' => $projectId]);
 		$score->score += $scoreChange;
 		if ($score->score < 0) return false;
@@ -45,8 +46,8 @@ class ScoreService {
 			$numConnections = Connection::where('initiator_id', $recipient->id)
 				->orWhere('recipient_id', $recipient->id)
 				->count();
-			$scoreChange = -1 * $numConnections;
-			if ($intermediary != null) $scoreChange += 2;
+			$scoreChange = -1 * $numConnections - 2;
+			if ($intermediary != null) $scoreChange += 4;
 		} else if ($type == 'answer') {
 			$scoreChange = -5;
 		} else if ($type == 'answer_all') {
@@ -57,27 +58,42 @@ class ScoreService {
 	}
 
 	public function applyUpdateRequestScore(Request $request) {
-		$recipient = User::find($request->recipient_id);
+		$initiator = User::find($request->initiator_id);
 		$intermediary = ($request->intermediary_id === null) ? null : User::find($request->intermediary_id);
 		$type = $request->type;
 		$state = $request->state;
 
-		// Get connection count of recipient.
-		$numConnections = Connection::where('initiator_id', $recipient->id)
-			->orWhere('recipient_id', $recipient->id)
-			->count();
-
-		$scoreChange = 0;
+		$yourScoreChange = 0;
+		$intermediaryScoreChange = 0;
+		$theirScoreChange = 0;
 
 		if ($state == 'accepted') {
-			$scoreChange = 2;
-			if ($intermediary != null) $scoreChange = 5;
-		} else if ($type == 'rejected') {
-			$scoreChange = 0;
-			if ($intermediary != null) $scoreChange = -2;
+			$yourScoreChange = 2;
+			$theirScoreChange = 10;
+			if ($intermediary != null) {
+				$yourScoreChange = 5;
+				$intermediaryScoreChange = 5;
+			}
+		} else if ($state == 'rejected') {
+			$yourScoreChange = -1;
+			$theirScoreChange = -10;
+			if ($intermediary != null) {
+				$yourScoreChange = -2;
+			}
 		}
 
-		return $this->applyScoreChange($scoreChange, $request->project_id);
+		if (!is_null($intermediary)) {
+			$outcome = $this->applyScoreChange(
+				$intermediaryScoreChange, $request->project_id, $intermediary->id);
+			if ($outcome === false) return false;
+		}
+
+		// You are the recipient of the request.
+		$outcome = $this->applyScoreChange(
+			$yourScoreChange, $request->project_id, $this->user->id);
+		if ($outcome === false) return false;
+
+		return $this->applyScoreChange($theirScoreChange, $request->project_id, $initiator->id);
 	}
 
 	public function get($projectId) {
