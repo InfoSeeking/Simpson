@@ -14,14 +14,14 @@ use App\Models\User;
 use App\Models\Score;
 use Faker;
 
-class CreateDemo extends Command
+class DemoCreate extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'demo:up';
+    protected $signature = 'demo:create';
 
     /**
      * The console command description.

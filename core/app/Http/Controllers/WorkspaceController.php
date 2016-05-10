@@ -104,8 +104,9 @@ class WorkspaceController extends Controller
         if (!$answersStatus->isOK()) return $answersStatus->asRedirect('workspace');
 
         $timeLeft = $this->projectService->getTimeLeft($projectId);
+        $numUnanswered = $this->answerService->getNumUnanswered($projectId);
 
-        if ($timeLeft == 0) {
+        if ($timeLeft == 0 || $numUnanswered == 0) {
             return redirect('/workspace/end');
         }
 

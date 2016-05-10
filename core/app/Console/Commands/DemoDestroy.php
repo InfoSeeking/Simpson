@@ -11,14 +11,14 @@ use App\Models\Request;
 use App\Models\User;
 use App\Models\Score;
 
-class DestroyDemo extends Command
+class DemoDestroy extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'demo:down';
+    protected $signature = 'demo:destroy';
 
     /**
      * The console command description.

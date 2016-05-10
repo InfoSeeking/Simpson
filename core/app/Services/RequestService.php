@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\AnswerService;
 use App\Services\MembershipService;
 use App\Services\ConnectionService;
+use App\Services\LogService;
 use App\Services\ProjectService;
 use App\Services\RealtimeService;
 use App\Services\ScoreService;
@@ -25,7 +26,8 @@ class RequestService {
 		ConnectionService $connectionService,
 		AnswerService $answerService,
 		ScoreService $scoreService,
-		ProjectService $projectService
+		ProjectService $projectService,
+		LogService $logService
 		) {
 		$this->memberService = $memberService;
 		$this->realtimeService = $realtimeService;
@@ -33,6 +35,7 @@ class RequestService {
 		$this->answerService = $answerService;
 		$this->scoreService = $scoreService;
 		$this->projectService = $projectService;
+		$this->logService = $logService;
 		$this->user = Auth::user();
 	}
 	
@@ -210,6 +213,14 @@ class RequestService {
 		}
 
 		$request->state = $args['state'];
+
+		$this->logService
+			->withUserId($this->user->id)
+			->withProjectId($request->project_id)
+			->withRequestId($request->id)
+			->withKey('request_state_change')
+			->withValue($request->state)
+			->save();
 		
 		if(!$this->scoreService->applyUpdateRequestScore($request)) {
 			return Status::fromError(

@@ -9,13 +9,16 @@ use App\Models\User;
 use App\Models\Score;
 use App\Services\RealtimeService;
 use App\Services\ConnectionService;
+use App\Services\LogService;
 
 class ScoreService {
 	public function __construct(RealtimeService $realtimeService,
-		ConnectionService $connectionService) {
+		ConnectionService $connectionService,
+		LogService $logService) {
 		$this->user = Auth::user();
 		$this->realtimeService = $realtimeService;
 		$this->connectionService = $connectionService;
+		$this->logService = $logService;
 	}
 
 	// Returns false if this would leave user with a negative score.
@@ -27,6 +30,13 @@ class ScoreService {
 		$score->score += $scoreChange;
 		if ($score->score < 0) return false;
 		$score->save();
+
+		$this->logService
+			->withUserId($this->user->id)
+			->withProjectId($projectId)
+			->withKey('score_change')
+			->withValue($scoreChange)
+			->save();
 
 		$this->realtimeService
 			->withModel($score)

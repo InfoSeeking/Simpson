@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\MembershipService;
 use App\Services\RealtimeService;
 use App\Services\ConnectionService;
+use App\Services\LogService;
 use App\Utilities\Status;
 use App\Utilities\StatusCodes;
 
@@ -19,12 +20,22 @@ class AnswerService {
 	public function __construct(
 		MembershipService $memberService,
 		RealtimeService $realtimeService,
-		ConnectionService $connectionService
+		ConnectionService $connectionService,
+		LogService $logService
 		) {
 		$this->memberService = $memberService;
 		$this->realtimeService = $realtimeService;
 		$this->connectionService = $connectionService;
+		$this->logService = $logService;
 		$this->user = Auth::user();
+	}
+
+	public function getNumUnanswered($projectId) {
+		return Answer::where('user_id', $this->user->id)
+			->where('project_id', $projectId)
+			->where('answered', false)
+			->get()
+			->count();
 	}
 
 	// Get all answers for this user on this project.
@@ -72,6 +83,32 @@ class AnswerService {
 			// Save this answer for the user.
 			$existingAnswer->answered = true;
 			$existingAnswer->save();
+
+			$numUnanswered = Answer::where('user_id', $this->user->id)
+				->where('project_id', $request->project_id)
+				->where('answered', false)
+				->get()
+				->count();
+
+			$this->logService
+				->withUserId($this->user->id)
+				->withProjectId($request->project_id)
+				->withRequestId($request->id)
+				->withAnswerId($existingAnswer->id)
+				->withKey('answer_get')
+				->withValue($request->answer_id)
+				->save();
+
+
+			if ($numUnanswered == 0) {
+				// User finished.
+				$this->logService
+					->withUserId($this->user->id)
+					->withProjectId($request->project_id)
+					->withRequestId($request->id)
+					->withKey('finished')
+					->save();
+			}
 			
 			$this->realtimeService
 				->withModel($existingAnswer)
