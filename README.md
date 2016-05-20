@@ -8,8 +8,8 @@ Installation Instructions
 
 SIMPSON is split into two components. Both of these must be installed to run your own instance of SIMPSON.
 
-- The <b>Core</b> component, written in PHP, consists of the main web application. The installation instructions are [here](/core)
-- The <b>Realtime</b> component, written in NodeJS, enables realtime notifications. The installation instructions are [here](/realtime)
+- The <b>Core</b> component, written in PHP, consists of the main web application. The installation instructions are [here](/core/readme.md)
+- The <b>Realtime</b> component, written in NodeJS, enables realtime notifications. The installation instructions are [here](/realtime/readme.md)
 
 Running a Study
 ---------------
@@ -55,7 +55,7 @@ php artisan demo:create
 A custom study is created using a configuration JSON file. See [this example configuration file](example-input.json) to reference. Some clarifications and remarks are as follows:
 
 - <b>projectName</b> must be a unique name. This is used to identify the study in case you wish to delete it.
-- <b>timeout<b> is the number of seconds a user has to complete the task
+- <b>timeout</b> is the number of seconds a user has to complete the task
 - <b>user.name</b> and <b>user.password</b> can both be optionally specified with a "?", meaning it will be randomly generated
 - <b>user.identifier</b> is not stored internally, but is used to reference users for specifiying <b>connections</b>
 
