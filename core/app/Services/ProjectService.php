@@ -29,8 +29,8 @@ class ProjectService {
             $membership->time_started = time();
             $membership->save();
         }
-
-        $endTime = $membership->time_started + (60 * 60);
+        $project = Project::find($projectId);
+        $endTime = $membership->time_started + $project->timeout;
         $timeLeft = ($endTime - time());
         return max(0,  $timeLeft);
     }

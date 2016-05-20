@@ -1,8 +1,9 @@
 {
-	"projectName": "StudyB",
+	"projectName": "StudyName",
 	"initialScore": 1000,
 	"numberQuestions": 20,
 	"answersPerUser": 12,
+	"timeout": 3600,
 	"users": [
 		{"name": "?", "identifier": "1", "password": "?"},
 		{"name": "?", "identifier": "2", "password": "?"},
@@ -12,6 +13,6 @@
 	],
 	"connections": [
 		["1", "3"],
-		["2", "4"]
+		["4", "5"]
 	]
 }

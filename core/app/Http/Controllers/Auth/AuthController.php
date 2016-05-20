@@ -6,6 +6,7 @@ use App\Models\User;
 use Auth;
 use Validator;
 use App\Http\Controllers\Controller;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
@@ -33,8 +34,9 @@ class AuthController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(LogService $logService)
     {
+        $this->logService = $logService;
         $this->middleware('guest', ['except' => 'getLogout']);
     }
 
@@ -72,6 +74,10 @@ class AuthController extends Controller
      * Called when the user is authenticated
      */
     protected function authenticated(Request $req, User $user) {
+        $this->logService->withUserId($user->id)
+            ->withKey("login")
+            ->save();
+            
         return redirect($this->redirectPath());
     }
 

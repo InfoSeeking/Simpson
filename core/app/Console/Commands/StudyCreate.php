@@ -68,6 +68,7 @@ class StudyCreate extends Command
         // Create project.
         $project = new Project(['title' => $json['projectName']]);
         $project->creator_id = 0;
+        if (array_key_exists('timeout', $json)) $project->timeout = $json['timeout'];
         $project->save();
         
         $userMap = [];
