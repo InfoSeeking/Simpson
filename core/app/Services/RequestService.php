@@ -202,7 +202,7 @@ class RequestService {
 			$connectionStatus = $this->connectionService->create([
 				'initiator_id' => $request->initiator_id,
 				'recipient_id' => $request->recipient_id,
-				// 'intermediary_id' => $request->intermediary_id, Will this spoil the validator?
+				'intermediary_id' => $request->intermediary_id,
 				'project_id' => $request->project_id
 				]);
 			if (!$connectionStatus->isOK()) return $connectionStatus;
