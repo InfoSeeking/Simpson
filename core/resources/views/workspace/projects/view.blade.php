@@ -40,7 +40,10 @@ page-view
 	</div>
 </div>
 <div class='col-md-6'>
-	<p>You have <b id='user-score'>{{ $userScore }}</b> NC Points and <b id='answer-score'>0</b> IC Points. You have <b id='time-left'>{{ $timeLeft }}</b> seconds left.</p>
+	<p>You have <b id='user-score'>{{ $userScore }}</b> NC Points, <b id='answer-score'>0</b> IC Points, and <b id='link-score'>0</b> L points</p>
+	<p>Your total score is <b id='total-score'>0</b></p>
+
+	<p>You have <b id='time-left'>{{ $timeLeft }}</b> seconds left.</p>
 
 	<h4>Question List</h4>
 	<div id='answer-list'></div>
@@ -162,6 +165,18 @@ They accepted.
 They rejected.
 <% if (request.state == 'open') %>
 Awaiting response.
+<% } else if (request.type=='connection' && request.direction == 'intermediary') { %>
+<td>
+Request was made from <%= request.initiator_name %> to <%= request.recipient_name %> through you.
+</td>
+
+<td>
+<% if (request.state == 'accepted') %>
+They accepted.
+<% else if (request.state == 'rejected') %>
+They rejected.
+<% if (request.state == 'open') %>
+Awaiting response.
 <% } %>
 </td>
 
@@ -233,9 +248,28 @@ answerListView.render();
 answerList.on('change', updateAnswerScore);
 updateAnswerScore();
 
+// connectionList change event doesn't seem to get triggered,
+// so I put a manual call in the realtime handler.
+connectionList.on('change', updateLinkScore);
+updateLinkScore();
+
 function updateAnswerScore() {
 	var total = answerList.where({isAnswered: true}).length;
 	$('#answer-score').html(total);
+	updateTotalScore();
+}
+
+function updateLinkScore() {
+	var total = connectionCount(Config.get('userId'));
+	$('#link-score').html(total);
+	updateTotalScore();
+}
+
+function updateTotalScore() {
+	var total = parseInt($('#answer-score').html()) +
+		parseInt($('#link-score').html()) +
+		parseInt($('#user-score').html());
+	$('#total-score').html(total);
 }
 
 function connectionCount(a) {
@@ -315,6 +349,7 @@ function realtimeDataHandler(param) {
 		_.each(param.data, function(connection) {
 			if (param.action == 'create') {
 				connectionList.add(connection);
+				updateLinkScore();
 			} else if (param.action == 'delete') {
 				connectionList.remove(connection);
 			}
@@ -330,6 +365,7 @@ function realtimeDataHandler(param) {
 		_.each(param.data, function(score) {
 			if (score.user_id == Config.get('userId')) {
 				$('#user-score').html(score.score);
+				updateTotalScore();
 			}
 		})
 	}

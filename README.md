@@ -52,7 +52,7 @@ php artisan demo:create
 ```
 
 ### Creating a Custom Study ###
-A custom study is created using a configuration JSON file. See [this example configuration file](example-input.json) to reference. Some clarifications and remarks are as follows:
+A custom study is created using a configuration JSON file. See [this example configuration file](core/example-input.json) to reference. Some clarifications and remarks are as follows:
 
 - <b>projectName</b> must be a unique name. This is used to identify the study in case you wish to delete it.
 - <b>timeout</b> is the number of seconds a user has to complete the task

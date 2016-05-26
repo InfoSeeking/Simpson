@@ -15,6 +15,8 @@ var RequestModel = Backbone.Model.extend({
 			} else if (this.get('recipient_id') == Config.get('userId')) {
 				this.set('direction', 'incoming');
 				this.set('timeLeft', 30);
+			} else if (this.get('intermediary_id') == Config.get('userId')) {
+				this.set('direction', 'intermediary');
 			} else {
 				this.set('direction', 'n/a');
 			}
@@ -142,7 +144,8 @@ var IncomingRequestListView = Backbone.View.extend({
 	},
 	add: function(model) {
 		// Filter by only incoming requests.
-		if (model.get('recipient_id') != Config.get('userId')) return;
+		if (model.get('recipient_id') != Config.get('userId') 
+			&& model.get('intermediary_id') != Config.get('userId')) return;
 		if (model.get('type') != 'connection') return;
 		var item = new RequestListItemView({model: model});
 		item.render();
