@@ -105,13 +105,14 @@ class WorkspaceController extends Controller
 
         $timeLeft = $this->projectService->getTimeLeft($projectId);
         $numUnanswered = $this->answerService->getNumUnanswered($projectId);
+        $project = $projectStatus->getResult();
 
-        if ($timeLeft == 0 || $numUnanswered == 0) {
-            return redirect('/workspace/end');
-        }
+        if ($timeLeft == 0 || $numUnanswered == 0) return redirect('/workspace/end');
+
+        if (!$project->active) return redirect('/workspace/instructions');
 
         return view('workspace.projects.view', [
-            'project' => $projectStatus->getResult(),
+            'project' => $project,
             'permission' => $permissionStatus->getResult(),
             'user' => Auth::user(),
             'userScore' => $this->scoreService->get($projectId),

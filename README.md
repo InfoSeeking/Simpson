@@ -58,6 +58,8 @@ A custom study is created using a configuration JSON file. See [this example con
 - <b>timeout</b> is the number of seconds a user has to complete the task
 - <b>user.name</b> and <b>user.password</b> can both be optionally specified with a "?", meaning it will be randomly generated
 - <b>user.identifier</b> is not stored internally, but is used to reference users for specifiying <b>connections</b>
+- <b>active</b> is true/false indicating whether or not the study will be accessible by users. This can be changed with the study:activate and study:deactivate commands
+- <b>description</b> is the study description. This appears on the instructions page below the scoring chart. This is a good spot to indicate when the study opens up for reference.
 
 To create the study using this configuration file, run the following command:
 
@@ -74,3 +76,11 @@ php artisan study:destroy --name "StudyName"
 
 Only run this in the event that you are certain you wish to delete all project data. It is unlikely you will need to do this unless you made an initial configuration mistake. Having extra data is always better than losing it!
 
+### Activating and Deactivating Studies ###
+If a study is <i>active</i> then users can log in and take the study. If a study is <i>inactive</i> the instructions page will say the project is currently inactive and will not show links to take the study. You can specify in the json configuration whether the study is active or not and you can modify this with the following commands:
+
+
+```
+php artisan study:activate --name "StudyName"
+php artisan study:deactivate --name "StudyName"
+```

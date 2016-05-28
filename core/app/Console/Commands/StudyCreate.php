@@ -65,10 +65,14 @@ class StudyCreate extends Command
         if (!is_null($project)) 
             return printf("Project with name \"%s\" already exists\n", $json['projectName']);
 
+        if (stristr($json['projectName'], ' ')) return printf("Project name cannot have spaces\n");
+
         // Create project.
         $project = new Project(['title' => $json['projectName']]);
         $project->creator_id = 0;
         if (array_key_exists('timeout', $json)) $project->timeout = $json['timeout'];
+        if (array_key_exists('active', $json)) $project->active = $json['active'];
+        if (array_key_exists('description', $json)) $project->description = $json['description'];
         $project->save();
         
         $userMap = [];

@@ -4,6 +4,8 @@
 	"numberQuestions": 20,
 	"answersPerUser": 12,
 	"timeout": 3600,
+	"active": false,
+	"description": "This study will become active <b>June 1st, 2016 at 3pm EST</b>. Return to this page at that time.",
 	"users": [
 		{"name": "?", "identifier": "1", "password": "?"},
 		{"name": "?", "identifier": "2", "password": "?"},

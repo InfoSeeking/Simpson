@@ -2,7 +2,9 @@
 
 @section('navigation')
 <a href='/workspace/instructions'>Instructions</a>
+@if ($project->active)
 <a href='/workspace/projects/{{$project->id}}'>Study</a>
+@endif
 @endsection('navigation')
 
 @section('main-content')
@@ -35,8 +37,17 @@
 	<small>**N is the number of connections you have.</small>
 </p>
 
+@if (!empty($project->description))
+<h2>Study Instructions</h2>
+<p> {!! $project->description !!} </p>
+@endif
+
 <p>You can return to these instructions at any time by clicking the <i>INSTRUCTIONS</i> link at the top of the page.</p>
 
+@if ($project->active)
 <a class='btn btn-primary' href='/workspace/projects/{{$project->id}}'>Continue to Study &raquo;</a>
+@else
+<p>This project is not currently active.</p>
+@endif
 </div>
 @endsection

@@ -18,7 +18,9 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\DemoCreate::class,
         \App\Console\Commands\DemoDestroy::class,
         \App\Console\Commands\StudyCreate::class,
-        \App\Console\Commands\StudyDestroy::class
+        \App\Console\Commands\StudyDestroy::class,
+        \App\Console\Commands\StudyActivate::class,
+        \App\Console\Commands\StudyDeactivate::class
     ];
 
     /**
