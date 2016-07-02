@@ -15,13 +15,14 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\GenerateApiDocumentation::class,
-        \App\Console\Commands\DemoCreate::class,
-        \App\Console\Commands\DemoDestroy::class,
+        // \App\Console\Commands\DemoCreate::class,
+        // \App\Console\Commands\DemoDestroy::class,
         \App\Console\Commands\StudyCreate::class,
         \App\Console\Commands\StudyDestroy::class,
         \App\Console\Commands\StudyActivate::class,
         \App\Console\Commands\StudyDeactivate::class,
-        \App\Console\Commands\StudyInfo::class
+        \App\Console\Commands\StudyInfo::class,
+        \App\Console\Commands\StudyAdvance::class
     ];
 
     /**
