@@ -20,7 +20,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\StudyCreate::class,
         \App\Console\Commands\StudyDestroy::class,
         \App\Console\Commands\StudyActivate::class,
-        \App\Console\Commands\StudyDeactivate::class
+        \App\Console\Commands\StudyDeactivate::class,
+        \App\Console\Commands\StudyInfo::class
     ];
 
     /**

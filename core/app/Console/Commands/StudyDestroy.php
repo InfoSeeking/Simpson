@@ -57,25 +57,27 @@ class StudyDestroy extends Command
 
         $studyName = $this->option('name');
         if (!$studyName) return $this->usage();
-        $project = Project::where('title', $studyName)->first();
-        if (is_null($project)) return printf("Project \"%s\" not found\n", $studyName);
+        $projects = Project::where('title', $studyName)->get();
+        if ($projects->count() == 0) {
+            exit(sprintf("No project with name \"%s\" found\n", $studyName));
+        }
+        foreach ($projects as $project) {
+            // Delete all users of this.
+            $memberships = Membership::where('project_id', $project->id)->get();
+            $users = User::whereIn('id', $memberships->pluck('user_id'))->get();
 
-        // Delete all users of this.
-        $memberships = Membership::where('project_id', $project->id)->get();
-        $users = User::whereIn('id', $memberships->pluck('user_id'))->get();
+            Connection::whereIn('recipient_id', $users->pluck('id'))->delete();
+            Connection::whereIn('initiator_id', $users->pluck('id'))->delete();
+            Request::whereIn('recipient_id', $users->pluck('id'))->delete();
+            Request::whereIn('initiator_id', $users->pluck('id'))->delete();
+            Membership::whereIn('user_id', $users->pluck('id'))->delete();
+            Answer::whereIn('user_id', $users->pluck('id'))->delete();
+            Score::whereIn('user_id', $users->pluck('id'))->delete();
+            User::whereIn('id', $users->pluck('id'))->delete();
+            Membership::whereIn('id', $memberships->pluck('id'));
 
-        Connection::whereIn('recipient_id', $users->pluck('id'))->delete();
-        Connection::whereIn('initiator_id', $users->pluck('id'))->delete();
-        Request::whereIn('recipient_id', $users->pluck('id'))->delete();
-        Request::whereIn('initiator_id', $users->pluck('id'))->delete();
-        Membership::whereIn('user_id', $users->pluck('id'))->delete();
-        Answer::whereIn('user_id', $users->pluck('id'))->delete();
-        Score::whereIn('user_id', $users->pluck('id'))->delete();
-        User::whereIn('id', $users->pluck('id'))->delete();
-        Membership::whereIn('id', $memberships->pluck('id'));
-
-        $project->delete();
-
+            $project->delete();
+        }
         printf("Project and data deleted\n");
     }
 }

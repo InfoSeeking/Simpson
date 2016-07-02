@@ -174,6 +174,34 @@ class ProjectService {
         return $project;
     }
 
+    // May return null if no currently started project.
+    public function getCurrentStudyProject() {
+        $project = DB::table('projects')
+            ->join('memberships', 'projects.id', '=', 'memberships.project_id')
+            ->where('projects.state', 'started')
+            ->andWhere(function($query) {
+                $query->where('projects.creator_id', '=', $this->user->id)
+                    ->orWhere('memberships.user_id', '=', $this->user->id);
+                })
+            ->select('projects.*', 'memberships.level as level')
+            ->first();
+        return $project;
+    }
+
+    // Returns null if all projects are finished.
+    public function getNextStudyProject() {
+        $project = DB::table('projects')
+            ->join('memberships', 'projects.id', '=', 'memberships.project_id')
+            ->where('projects.state', 'in_queue')
+            ->andWhere(function($query) {
+                $query->where('projects.creator_id', '=', $this->user->id)
+                    ->orWhere('memberships.user_id', '=', $this->user->id);
+                })
+            ->select('projects.*', 'memberships.level as level')
+            ->first();
+        return $project;
+    }
+
     // User must be logged in.
     public function getMyProjects() {
         return Project::where('creator_id', $this->user->id)->get();
