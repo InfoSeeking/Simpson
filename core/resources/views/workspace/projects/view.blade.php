@@ -40,10 +40,10 @@ page-view
 	</div>
 </div>
 <div class='col-md-6'>
-	<p>You have <b id='user-score'>{{ $userScore }}</b> NC Points, <b id='answer-score'>0</b> IC Points, and <b id='link-score'>0</b> L points</p>
+	<p>You have <b id='user-score'>{{ $userScore }}</b> Network Capital (NC) Points, <b id='answer-score'>0</b> Answers collected, and are linked to  <b id='link-score'>0</b> other people</p>
 	<p>Your total score is <b id='total-score'>0</b></p>
 
-	<p>You have <b id='time-left'>{{ $timeLeft }}</b> seconds left.</p>
+	<p>Time left: <b id='time-left'>{{ floor($timeLeft / 60) }}:{{ $timeLeft % 60}}</b></p>
 
 	<h4>Question List</h4>
 	<div id='answer-list'></div>
@@ -164,7 +164,7 @@ They accepted.
 <% else if (request.state == 'rejected') %>
 They rejected.
 <% if (request.state == 'open') %>
-Awaiting response.
+Time left for them: <span class='time-left'><%= request.timeLeft %></span>
 <% } else if (request.type=='connection' && request.direction == 'intermediary') { %>
 <td>
 Request was made from <%= request.initiator_name %> to <%= request.recipient_name %> through you.
@@ -176,7 +176,7 @@ They accepted.
 <% else if (request.state == 'rejected') %>
 They rejected.
 <% if (request.state == 'open') %>
-Awaiting response.
+Time left for them: <span class='time-left'><%= request.timeLeft %></span>
 <% } %>
 </td>
 
@@ -408,7 +408,7 @@ var resetTickTimer = (function(){
 		timeLeft--;
 		if (timeLeft < 0) timeLeft = 0;
 		if (timeLeft == 0) window.location = "/workspace/end";
-		countdownEl.html(timeLeft);
+		countdownEl.html(Math.floor(timeLeft / 60) + ":" + (timeLeft % 60));
 	}
 	window.setInterval(countdown, 1000);
 }());
