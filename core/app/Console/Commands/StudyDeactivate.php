@@ -46,8 +46,8 @@ class StudyDeactivate extends Command
         $project = Project::where('title', $projectName)->first();
         if (is_null($project)) return printf("Project %s not found\n", $projectName);
         if (!$project->active) return printf("Project %s is already deactivated\n", $projectName);
-        $project->active = false;
-        $project->save();
+        // Update all scenarios.
+        Project::where('title', $projectName)->update(['active' => false]);
         printf("Project %s is now deactivated\n", $projectName);
     }
 }

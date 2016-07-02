@@ -107,7 +107,7 @@ class WorkspaceController extends Controller
         $numUnanswered = $this->answerService->getNumUnanswered($projectId);
         $project = $projectStatus->getResult();
 
-        if ($timeLeft == 0 || $numUnanswered == 0) return redirect('/workspace/end');
+        if ($timeLeft == 0 || $numUnanswered == 0 || $project->state == 'finished') return redirect('/workspace/end');
 
         if (!$project->active) return redirect('/workspace/instructions');
 
@@ -227,18 +227,37 @@ class WorkspaceController extends Controller
     }
 
     public function showInstructions() {
-        $project = $this->projectService->getStudyProject();
+        $currentProject = $this->projectService->getCurrentStudyProject();
+        $nextProject = $this->projectService->getNextStudyProject();
+        if (!$currentProject && !$nextProject) {
+            return redirect('/workspace/end');
+        }
         return view('workspace.instructions', [
             'user' => Auth::user(),
-            'project' => $project
+            'project' => $currentProject ? $currentProject : $nextProject,
             ]);
     }
 
     public function showEnd() {
-        $project = $this->projectService->getStudyProject();
+
+        $currentProject = $this->projectService->getCurrentStudyProject();
+        $nextProject = $this->projectService->getNextStudyProject();
+
+        // Check if the user should go to the current project (i.e. the transition has occured).
+        if ($currentProject) {
+            $timeLeft = $this->projectService->getTimeLeft($currentProject->id);
+            $numUnanswered = $this->answerService->getNumUnanswered($currentProject->id);
+            if ($timeLeft == 0 || $numUnanswered == 0) {
+                // User finished this scenario, but the scenario is still active.
+            } else {
+                // The transition has been made,
+                $nextProject = $currentProject;
+            }
+        }
+
         return view('workspace.end', [
             'user' => Auth::user(),
-            'project' => $project
+            'project' => $nextProject
             ]);   
     }
 

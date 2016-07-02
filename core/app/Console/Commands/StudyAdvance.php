@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use App\Models\Project;
+use App\Models\Score;
+use App\Models\Membership;
 
 class StudyAdvance extends Command
 {
@@ -37,6 +39,11 @@ class StudyAdvance extends Command
         printf("--name corresponds to the projectName given in the input file\n");
     }
 
+    private function checkContinue() {
+        $answer = $this->ask("Are you sure you wish to continue (y/n)?");
+        if ($answer != "y" && $answer != "yes" && $answer != "Y") exit("Exiting\n");
+    }
+
     /**
      * Execute the console command.
      *
@@ -60,15 +67,13 @@ class StudyAdvance extends Command
             exit("Project is already finished.\n");
         }
 
-        if ($currentProject && $nextProject) {
-            printf("This will change from scenario %s to %s.", $currentProject->scenario_name, $nextProject->scenario_name);
-        } else if ($currentProject) {
+        if ($currentProject) {
             printf("This will end scenario %s.\n", $currentProject->scenario_name);
         } else if ($nextProject) {
             printf("This will start scenario %s.\n", $nextProject->scenario_name);
         }
-        $answer = $this->ask("Are you sure you wish to continue (y/n)?");
-        if ($answer != "y" && $answer != "yes" && $answer != "Y") return printf("Exiting\n");
+        $this->checkContinue();
+        
 
 
         if ($nextProject && $nextProject->nextProject) {
@@ -80,20 +85,49 @@ class StudyAdvance extends Command
 
         if ($currentProject) {
             printf("Transitioning scenario %s from \"started\" to \"finished\".\n", $currentProject->scenario_name);
+            // Check if the timers have expired yet.
+            $membership = Membership::where('project_id', $currentProject->id)->first();
+            $timeStarted = $membership->time_started;
+            $endTime = $timeStarted + $currentProject->timeout;
+            $timeLeft = ($endTime - time());
+
+            if ($timeLeft > 0) {
+                printf("There is still %s seconds left in this task.\n", $timeLeft);
+                printf("Users who are still performing in the task will not be forced\n");
+                printf("off of the page until the timer expires or they refresh.\n");
+                $this->checkContinue();
+            }
+            
             $currentProject->state = 'finished';
             $currentProject->save();
-        }
-
-        if ($nextProject) {
+        } else if ($nextProject) {
             printf("Transitioning scenario %s from \"in_queue\" to \"started\".\n", $nextProject->scenario_name);
             $nextProject->state = 'started';
             $nextProject->save();
-        }
 
-        if ($followingProject) {
-            printf("Transitioning scenario %s from \"unstarted\" to \"in_queue\".\n", $followingProject->scenario_name);
-            $followingProject->state = 'in_queue';
-            $followingProject->save();
+            // Copy over scores if necessary.
+            if ($nextProject->prevProject) {
+                $previousProject = Project::find($nextProject->prevProject);
+                $currentScores = Score::where('project_id', $previousProject->id)->get();
+                $nextScores = Score::where('project_id', $nextProject->id)->get();
+                foreach ($currentScores as $currentScore) {
+                    Score::where('project_id', $nextProject->id)
+                        ->where('user_id', $currentScore->user_id)
+                        ->update(['score' => $currentScore->score]);
+                }
+                printf("  Scores copied from previos scenario.\n");
+            }
+
+            // Start timers.
+            Membership::where('project_id', $nextProject->id)->update(['time_started' => time()]);
+            printf("  Timers started.\n");
+
+            // Enqueue the next project if necessary.
+            if ($followingProject) {
+                printf("Transitioning scenario %s from \"unstarted\" to \"in_queue\".\n", $followingProject->scenario_name);
+                $followingProject->state = 'in_queue';
+                $followingProject->save();
+            }
         }
     }
 }

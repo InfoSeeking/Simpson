@@ -25,9 +25,9 @@ class ProjectService {
     public function getTimeLeft($projectId) {
         $membership = Membership::where('project_id', $projectId)->where('user_id', $this->user->id)->first();
         if (is_null($membership->time_started)) {
-            // Start it
-            $membership->time_started = time();
-            $membership->save();
+            // Start it [no longer necessary]
+            // $membership->time_started = time();
+            // $membership->save();
         }
         $project = Project::find($projectId);
         $endTime = $membership->time_started + $project->timeout;
@@ -179,7 +179,7 @@ class ProjectService {
         $project = DB::table('projects')
             ->join('memberships', 'projects.id', '=', 'memberships.project_id')
             ->where('projects.state', 'started')
-            ->andWhere(function($query) {
+            ->where(function($query) {
                 $query->where('projects.creator_id', '=', $this->user->id)
                     ->orWhere('memberships.user_id', '=', $this->user->id);
                 })
@@ -193,7 +193,7 @@ class ProjectService {
         $project = DB::table('projects')
             ->join('memberships', 'projects.id', '=', 'memberships.project_id')
             ->where('projects.state', 'in_queue')
-            ->andWhere(function($query) {
+            ->where(function($query) {
                 $query->where('projects.creator_id', '=', $this->user->id)
                     ->orWhere('memberships.user_id', '=', $this->user->id);
                 })

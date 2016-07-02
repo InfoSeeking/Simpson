@@ -42,12 +42,13 @@
 <p> {!! $project->description !!} </p>
 @endif
 
-<p>You can return to these instructions at any time by clicking the <i>INSTRUCTIONS</i> link at the top of the page.</p>
-
-@if ($project->active)
+@if ($project->active && $project->state == 'started')
 <a class='btn btn-primary' href='/workspace/projects/{{$project->id}}'>Continue to Study &raquo;</a>
 @else
-<p>This project is not currently active.</p>
+<p>The study is not currently active, please refresh the page at the time this study starts.</p>
+
+<p>You can return to these instructions at any time by clicking the <i>INSTRUCTIONS</i> link at the top of the page.</p>
+
 @endif
 </div>
 @endsection

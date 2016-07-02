@@ -84,3 +84,13 @@ If a study is <i>active</i> then users can log in and take the study. If a study
 php artisan study:activate --name "StudyName"
 php artisan study:deactivate --name "StudyName"
 ```
+
+
+Tips
+----
+
+- Do not destroy projects if they have been used. This removes all data associated with them.
+- Only advance scenarios at the scheduled time. If a scenario has been finished before the scenario timer is up, users will not be aware of this until the timer expires.
+- Database oddities:
+	- "Scenarios" are in the projects table
+	- There is a copy of the score for each scenario in the scores table. The score associated with the last scenario is the final score of the user.
