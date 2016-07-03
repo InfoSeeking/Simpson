@@ -37,7 +37,7 @@ class AnswerService {
 			->get()
 			->count();
 	}
-
+	
 	// Get all answers for this user on this project.
 	public function getMultiple($args) {
 		$validator = Validator::make($args, [

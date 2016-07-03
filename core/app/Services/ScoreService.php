@@ -2,11 +2,13 @@
 namespace App\Services;
 
 use Auth;
+use App\Models\Answer;
 use App\Models\Connection;
 use App\Models\Project;
 use App\Models\Request;
 use App\Models\User;
 use App\Models\Score;
+use App\Services\ProjectService;
 use App\Services\RealtimeService;
 use App\Services\ConnectionService;
 use App\Services\LogService;
@@ -14,11 +16,13 @@ use App\Services\LogService;
 class ScoreService {
 	public function __construct(RealtimeService $realtimeService,
 		ConnectionService $connectionService,
-		LogService $logService) {
+		LogService $logService,
+		ProjectService $projectService) {
 		$this->user = Auth::user();
 		$this->realtimeService = $realtimeService;
 		$this->connectionService = $connectionService;
 		$this->logService = $logService;
+		$this->projectService = $projectService;
 	}
 
 	// Returns false if this would leave user with a negative score.
@@ -43,6 +47,47 @@ class ScoreService {
 			->onProject($projectId)
 			->emit('update');
 		return $score->score;
+	}
+
+	public function getPlace($projectId) {
+		// Get cumulative scores for all finished scenarios for all users.
+		$projectName = Project::find($projectId)->title;
+		$allProjects = Project::where('title', $projectName)->get();
+		$userScores = [];
+
+		foreach($allProjects as $project) {
+			$sharedUsersStatus = $this->projectService->getSharedUsers($project->id);
+			if (!$sharedUsersStatus->isOK()) return 0;
+			$projectMemberships = $sharedUsersStatus->getResult();
+			foreach ($projectMemberships as $membership) {
+				$user = $membership->user;
+
+				$score = Score::where('project_id', $project->id)
+					->where('user_id', $user->id)
+					->first()
+					->score;
+
+				$numConnections = Connection::where('initiator_id', $user->id)
+					->orWhere('recipient_id', $user->id)
+					->count();
+
+				$numAnswers = Answer::where('user_id', $user->id)
+					->where('project_id', $project->id)
+					->where('answered', true)
+					->get()
+					->count();
+				if (!array_key_exists($user->id, $userScores)) $userScores[$user->id] = 0;
+				$userScores[$user->id] += $numConnections + $numAnswers + $score;
+			}
+		}
+		
+		arsort($userScores);
+		$place = 1;
+		foreach ($userScores as $userId => $userScore) {
+			if ($this->user->id == $userId) break;
+			$place++;
+		}
+		return $place;
 	}
 
 	public function applyOpenRequestScore(Request $request) {

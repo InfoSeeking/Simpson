@@ -120,7 +120,8 @@ class WorkspaceController extends Controller
             'requests' => $requestsStatus->getResult(),
             'connections' => $connectionsStatus->getResult(),
             'answers' => $answersStatus->getResult(),
-            'timeLeft' => $timeLeft
+            'timeLeft' => $timeLeft,
+            'place' => $this->scoreService->getPlace($projectId)
             ]);
     }
 

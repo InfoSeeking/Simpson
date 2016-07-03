@@ -41,7 +41,7 @@ page-view
 </div>
 <div class='col-md-6'>
 	<p>You have <b id='user-score'>{{ $userScore }}</b> Network Capital (NC) Points, <b id='answer-score'>0</b> Answers collected, and are linked to  <b id='link-score'>0</b> other people</p>
-	<p>Your total score is <b id='total-score'>0</b></p>
+	<p>Your total score is <b id='total-score'>0</b>. Your rank is <b id='place'>{{ $place }}</b> of {{ count($sharedUsers) }}.</p>
 
 	<p>Time left: <b id='time-left'>{{ floor($timeLeft / 60) }}:{{ $timeLeft % 60}}</b></p>
 
@@ -411,6 +411,16 @@ var resetTickTimer = (function(){
 		countdownEl.html(Math.floor(timeLeft / 60) + ":" + (timeLeft % 60));
 	}
 	window.setInterval(countdown, 1000);
+
+	function updatePlace() {
+		$.ajax({
+			'url': '/api/v1/scores/place/{{ $project->id }}',
+			'success': function(res) {
+				$("#place").html(res.result);
+			}
+		});
+	}
+	window.setInterval(updatePlace, 10000);
 }());
 
 

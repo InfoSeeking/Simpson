@@ -88,4 +88,5 @@ Route::group(['middleware' => 'api.optional.auth'], function(){
 
 	Route::post('api/v1/tick', 'Api\TickController@tick');
 
+	Route::get('api/v1/scores/place/{project_id}', 'Api\ScoreController@getPlace');
 });

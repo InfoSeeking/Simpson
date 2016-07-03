@@ -105,19 +105,6 @@ class StudyAdvance extends Command
             $nextProject->state = 'started';
             $nextProject->save();
 
-            // Copy over scores if necessary.
-            if ($nextProject->prevProject) {
-                $previousProject = Project::find($nextProject->prevProject);
-                $currentScores = Score::where('project_id', $previousProject->id)->get();
-                $nextScores = Score::where('project_id', $nextProject->id)->get();
-                foreach ($currentScores as $currentScore) {
-                    Score::where('project_id', $nextProject->id)
-                        ->where('user_id', $currentScore->user_id)
-                        ->update(['score' => $currentScore->score]);
-                }
-                printf("  Scores copied from previos scenario.\n");
-            }
-
             // Start timers.
             Membership::where('project_id', $nextProject->id)->update(['time_started' => time()]);
             printf("  Timers started.\n");
