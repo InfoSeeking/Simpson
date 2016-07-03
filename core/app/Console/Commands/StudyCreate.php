@@ -174,6 +174,10 @@ class StudyCreate extends Command
 
         if (!array_key_exists('scenarios', $json)) exit("Scenarios array not found.\n");
 
+        $shuffle = false;
+        if (array_key_exists('shuffleScenarioOrder', $json)) $shuffle = $json['shuffleScenarioOrder'];
+        if ($shuffle) shuffle($json['scenarios']);
+
         $userMap = [];
         // Create users.
         foreach ($json['users'] as &$userJSON) {
