@@ -10,11 +10,18 @@
 @section('main-content')
 <div class='col-md-6'>
 <h1>Welcome to SIMPSON</h1>
+
+
+<b>Welcome!</b><p>In this game, you are looking to find answers for certain questions. 
+Each of you have 20 questions to answer and you all start off with about 4 randomly assigned answers. The row of numbers that you will see on the next page represent the 20 questions and the ones highlighted in green represent the answers you have in real time. </p><p>You will find these answers by picking people to connect with and then ask them if they have an answer (you can only ask for one at a time). To pick someone, click on their representation in the real-time network visual window (on the left hand side) and you will be prompted to connect with them. The person receiving such a request must then say "yes" within a certain amount of time (otherwise, the response defaults to a "no").</p><p>Making connections, rejecting connections, and asking questions all have costs and benefits to them and these are outlined for you in the table below and also as you progress through the game.</p><p>The goal of this exercise is to collect ALL answers to the 20 questions, while maximizing your total score (also depicted in real-time on the next page). You have 30 minutes to complete this exercise.</p>
+
+<!-- 
 <p>In this study you will have sixty minutes to collect answers from other users. Everyone is initially randomly assigned a fixed number of answers. To obtain an answer, you must first connect with a user, then request an answer from them. Each answer you obtain increases your information capital (IC). Your session completes if you obtain all of the answers.
 </p>
 
 <p>Each action has an associated cost. In addition to finding all of the answers, the goal of the task includes getting a high network capital (NC). The costs are summarized below, but are also presented during the study.
 </p>
+-->
 
 <h4>Action Costs/Benefits</h4>
 <table class='table table-condensed table-striped'>
