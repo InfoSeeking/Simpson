@@ -258,7 +258,6 @@ var answerList = new AnswerCollection({!! $answers->toJSON() !!});
 
 var questionList = new QuestionCollection({!! $questions->toJSON() !!});
 var questionListView = new QuestionListView({ collection: questionList });
-questionListView.render();
 
 answerList.on('change', onAnswerChange);
 onAnswerChange();
@@ -270,9 +269,12 @@ updateLinkScore();
 
 // Updates answer score, re-renders question view for this answer.
 function onAnswerChange() {
-	var total = answerList.where({isAnswered: true}).length;
+	var total = answerList.where({answered: 1}).length;
 	$('#answer-score').html(total);
 	updateTotalScore();
+
+	// Rerender entire question view for now (TODO: optimize)
+	questionListView.render();
 }
 
 function updateLinkScore() {
@@ -343,7 +345,7 @@ function canRequestConnection(to) {
 }
 
 function checkAllAnswered() {
-	if (answerList.where({'isAnswered': false}).length == 0) {
+	if (answerList.where({answered: 0}).length == 0) {
 		window.setTimeout(function() {
 			window.location = '/workspace/end';
 		}, 1000);
@@ -424,7 +426,10 @@ var resetTickTimer = (function(){
 		timeLeft--;
 		if (timeLeft < 0) timeLeft = 0;
 		if (timeLeft == 0) window.location = "/workspace/end";
-		countdownEl.html(Math.floor(timeLeft / 60) + ":" + (timeLeft % 60));
+		var seconds = (timeLeft % 60);
+		if (seconds < 10) seconds = "0" + seconds;
+		else seconds = "" + seconds;
+		countdownEl.html(Math.floor(timeLeft / 60) + ":" + seconds);
 	}
 	window.setInterval(countdown, 1000);
 

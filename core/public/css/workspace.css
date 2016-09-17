@@ -528,7 +528,6 @@ footer {
 
 #question-list .answer[data-answered="1"] span {
 	opacity: 1;
-
 }
 
 .selected-answer { display: none; }

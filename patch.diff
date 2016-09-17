@@ -1,0 +1,96 @@
+diff --git a/core/jsonMaker.py b/core/jsonMaker.py
+old mode 100644
+new mode 100755
+index cd17ebd..30f0cb3
+--- a/core/jsonMaker.py
++++ b/core/jsonMaker.py
+@@ -4,14 +4,16 @@
+ # Last modified: 06/27/2016
+ 
+ def inputs():
+-    stuff = ["","","","","","",""]
+-    stuff[0] = raw_input("Project Name::::::::")
+-    stuff[1] = raw_input("Initial NC::::::::::")
+-    stuff[2] = raw_input("Number of Questions:")
+-    stuff[3] = raw_input("Answers per User::::")
+-    stuff[4] = raw_input("Timeout in Seconds::")
+-    stuff[5] = raw_input("Number of users:::::")
+- #   stuff[6] = raw_input("Configuration (A, B1, B2, B3):")
++    stuff = ["","","","","","","","",""]
++    stuff[0] = raw_input("Project Name:::::::: ")
++    stuff[1] = raw_input("Initial NC:::::::::: ")
++    stuff[2] = raw_input("Number of Questions: ")
++    stuff[3] = raw_input("Answers per User:::: ")
++    stuff[4] = raw_input("Timeout in Seconds:: ")
++    stuff[5] = raw_input("Number of users::::: ")
++    stuff[6] = raw_input("Active (true/false): ")
++    stuff[7] = raw_input("Description::::::::: ")
++ #   stuff[8] = raw_input("Configuration (A, B1, B2, B3):")
+ 
+     return (stuff)
+ 
+@@ -25,6 +27,8 @@ if __name__ == "__main__":
+     print "\t \"numberQuestions\": \""+param[2]+"\","
+     print "\t \"answersPerUser\": \""+param[3]+"\","
+     print "\t \"timeout\": \""+param[4]+"\","
++    print "\t \"active\": \""+param[6]+"\","
++    print "\t \"description\": \""+param[7]+"\","
+ 
+     print "\t \"users\": ["
+     for x in xrange(1,int(param[5])):
+@@ -37,6 +41,3 @@ if __name__ == "__main__":
+     print "\t ]"
+     print "}"
+ 
+-
+-
+-
+diff --git a/core/resources/views/workspace/instructions.blade.php b/core/resources/views/workspace/instructions.blade.php
+index 08880ce..2402721 100644
+--- a/core/resources/views/workspace/instructions.blade.php
++++ b/core/resources/views/workspace/instructions.blade.php
+@@ -10,11 +10,17 @@
+ @section('main-content')
+ <div class='col-md-6'>
+ <h1>Welcome to SIMPSON</h1>
++
++<b>Welcome!</b><p>In this game, you are looking to find answers for certain questions. 
++Each of you have 20 questions to answer and you all start off with about 4 randomly assigned answers. The row of numbers that you will see on the next page represent the 20 questions and the ones highlighted in green represent the answers you have in real time. </p><p>You will find these answers by picking people to connect with and then ask them if they have an answer (you can only ask for one at a time). To pick someone, click on their representation in the real-time network visual window (on the left hand side) and you will be prompted to connect with them. The person receiving such a request must then say "yes" within a certain amount of time (otherwise, the response defaults to a "no").</p><p>Making connections, rejecting connections, and asking questions all have costs and benefits to them and these are outlined for you in the table below and also as you progress through the game.</p><p>The goal of this exercise is to collect ALL answers to the 20 questions, while maximizing your total score (also depicted in real-time on the next page). You have 30 minutes to complete this exercise.</p>
++
++<!-- 
+ <p>In this study you will have sixty minutes to collect answers from other users. Everyone is initially randomly assigned a fixed number of answers. To obtain an answer, you must first connect with a user, then request an answer from them. Each answer you obtain increases your information capital (IC). Your session completes if you obtain all of the answers.
+ </p>
+ 
+ <p>Each action has an associated cost. In addition to finding all of the answers, the goal of the task includes getting a high network capital (NC). The costs are summarized below, but are also presented during the study.
+ </p>
++-->
+ 
+ <h4>Action Costs/Benefits</h4>
+ <table class='table table-condensed table-striped'>
+@@ -50,4 +56,4 @@
+ <p>This project is not currently active.</p>
+ @endif
+ </div>
+-@endsection
+\ No newline at end of file
++@endsection
+diff --git a/core/resources/views/workspace/projects/view.blade.php b/core/resources/views/workspace/projects/view.blade.php
+index e5e0ff6..f570ca5 100644
+--- a/core/resources/views/workspace/projects/view.blade.php
++++ b/core/resources/views/workspace/projects/view.blade.php
+@@ -40,7 +40,7 @@ page-view
+ 	</div>
+ </div>
+ <div class='col-md-6'>
+-	<p>You have <b id='user-score'>{{ $userScore }}</b> NC Points, <b id='answer-score'>0</b> IC Points, and <b id='link-score'>0</b> L points</p>
++	<p>You have <b id='user-score'>{{ $userScore }}</b> Network Capital (NC) Points, <b id='answer-score'>0</b> Answers collected, and are linked to  <b id='link-score'>0</b> other people</p>
+ 	<p>Your total score is <b id='total-score'>0</b></p>
+ 
+ 	<p>You have <b id='time-left'>{{ $timeLeft }}</b> seconds left.</p>
+@@ -416,4 +416,4 @@ var resetTickTimer = (function(){
+ 
+ 
+ </script>
+-@endsection('main-content')
+\ No newline at end of file
++@endsection('main-content')
