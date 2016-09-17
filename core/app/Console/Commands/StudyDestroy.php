@@ -12,6 +12,7 @@ use App\Services\ConnectionService;
 use App\Services\RequestService;
 use App\Models\User;
 use App\Models\Score;
+use App\Models\Question;
 
 class StudyDestroy extends Command
 {
@@ -66,15 +67,13 @@ class StudyDestroy extends Command
             $memberships = Membership::where('project_id', $project->id)->get();
             $users = User::whereIn('id', $memberships->pluck('user_id'))->get();
 
-            Connection::whereIn('recipient_id', $users->pluck('id'))->delete();
-            Connection::whereIn('initiator_id', $users->pluck('id'))->delete();
-            Request::whereIn('recipient_id', $users->pluck('id'))->delete();
-            Request::whereIn('initiator_id', $users->pluck('id'))->delete();
-            Membership::whereIn('user_id', $users->pluck('id'))->delete();
-            Answer::whereIn('user_id', $users->pluck('id'))->delete();
-            Score::whereIn('user_id', $users->pluck('id'))->delete();
+            Connection::where('project_id', $project->id)->delete();
+            Request::where('project_id', $project->id)->delete();
+            Question::where('project_id', $project->id)->delete();
+            Answer::where('project_id', $project->id)->delete();
+            Score::where('project_id', $project->id)->delete();
             User::whereIn('id', $users->pluck('id'))->delete();
-            Membership::whereIn('id', $memberships->pluck('id'));
+            Membership::whereIn('id', $memberships->pluck('id'))->delete();
 
             $project->delete();
         }

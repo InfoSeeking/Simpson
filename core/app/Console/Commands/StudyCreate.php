@@ -12,6 +12,7 @@ use App\Services\ConnectionService;
 use App\Services\RequestService;
 use App\Models\User;
 use App\Models\Score;
+use App\Models\Question;
 use Faker;
 
 class StudyCreate extends Command
@@ -50,8 +51,8 @@ class StudyCreate extends Command
         $questions = $json['questions'];
         $numTotalAnswers = 0;
 
-        foreach ($questions as &$question) {
-            $question['id'] = Question::create([
+        foreach ($questions as $index => $question) {
+            $questions[$index]['id'] = Question::create([
                 'text' => $question['question'],
                 'project_id' => $project->id,
                 'num_answers' => count($question['answers'])
