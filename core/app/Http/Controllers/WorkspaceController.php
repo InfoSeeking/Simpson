@@ -19,6 +19,7 @@ use App\Services\MembershipService;
 use App\Services\RequestService;
 use App\Services\ConnectionService;
 use App\Services\ScoreService;
+use App\Services\QuestionService;
 use App\Utilities\Status;
 
 class WorkspaceController extends Controller
@@ -29,13 +30,15 @@ class WorkspaceController extends Controller
         RequestService $requestService,
         ConnectionService $connectionService,
         AnswerService $answerService,
-        ScoreService $scoreService) {
+        ScoreService $scoreService,
+        QuestionService $questionService) {
         $this->projectService = $projectService;
         $this->memberService = $memberService;
         $this->requestService = $requestService;
         $this->connectionService = $connectionService;
         $this->answerService = $answerService;
         $this->scoreService = $scoreService;
+        $this->questionService = $questionService;
     }
 
     public function showProjectCreate() {
@@ -103,6 +106,9 @@ class WorkspaceController extends Controller
         $answersStatus = $this->answerService->getMultiple(['project_id' => $projectId]);
         if (!$answersStatus->isOK()) return $answersStatus->asRedirect('workspace');
 
+        $questionsStatus = $this->questionService->getMultiple(['project_id' => $projectId]);
+        if (!$questionsStatus->isOK()) return $questionsStatus->asRedirect('workspace');
+
         $timeLeft = $this->projectService->getTimeLeft($projectId);
         $numUnanswered = $this->answerService->getNumUnanswered($projectId);
         $project = $projectStatus->getResult();
@@ -121,7 +127,8 @@ class WorkspaceController extends Controller
             'connections' => $connectionsStatus->getResult(),
             'answers' => $answersStatus->getResult(),
             'timeLeft' => $timeLeft,
-            'place' => $this->scoreService->getPlace($projectId)
+            'place' => $this->scoreService->getPlace($projectId),
+            'questions' => $questionsStatus->getResult()
             ]);
     }
 

@@ -47,6 +47,7 @@ page-view
 
 	<h4>Question List</h4>
 	<div id='answer-list'></div>
+	<table id='question-list'></table>
 	<p class='selected-answer'>Selecting question <span></span>. Select a user below to ask.</p>
 
 	
@@ -194,6 +195,15 @@ Time left for them: <span class='time-left'><%= request.timeLeft %></span>
 </a>
 </script>
 
+<script type='text/template' data-template='question'>
+<td><%= text %></td>
+<% for (var i = 0; i < answers.length; i++) { %>
+<td class='answer' data-answered="<%= answers[i].get('answered') %>">
+	<span><%= answers[i].get('name') %></span>
+</td>
+<% } %>
+</script>
+
 <script type='text/template' data-template='ask-all'>
 <% if (count > 2) %>
 <a href='#' class='ask-all-btn btn btn-default'>Ask all connected users a Question <span class='cost cost-<%= cost.sign %>'>(<%= cost.cost %>)</span></a>
@@ -206,6 +216,7 @@ Time left for them: <span class='time-left'><%= request.timeLeft %></span>
 <script src='/js/data/request.js'></script>
 <script src='/js/data/connection.js'></script>
 <script src='/js/data/answer.js'></script>
+<script src='/js/data/question.js'></script>
 <script src='/js/vendor/moment.js'></script>
 <script>
 Config.setAll({
@@ -242,18 +253,23 @@ connectionGraphView.render();
 
 // These are only my own answers.
 var answerList = new AnswerCollection({!! $answers->toJSON() !!});
-var answerListView = new AnswerListView({ collection: answerList });
-answerListView.render();
+// var answerListView = new AnswerListView({ collection: answerList });
+// answerListView.render();
 
-answerList.on('change', updateAnswerScore);
-updateAnswerScore();
+var questionList = new QuestionCollection({!! $questions->toJSON() !!});
+var questionListView = new QuestionListView({ collection: questionList });
+questionListView.render();
+
+answerList.on('change', onAnswerChange);
+onAnswerChange();
 
 // connectionList change event doesn't seem to get triggered,
 // so I put a manual call in the realtime handler.
 connectionList.on('change', updateLinkScore);
 updateLinkScore();
 
-function updateAnswerScore() {
+// Updates answer score, re-renders question view for this answer.
+function onAnswerChange() {
 	var total = answerList.where({isAnswered: true}).length;
 	$('#answer-score').html(total);
 	updateTotalScore();

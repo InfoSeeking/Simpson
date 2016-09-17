@@ -484,7 +484,7 @@ footer {
 	margin-right: 5px;
 	padding: 2px;
 	margin-top: 2px;
-	width: 20px;
+	/*width: px;*/
 	text-align: center;
 	border-radius: 2px;
 }
@@ -496,6 +496,39 @@ footer {
 #answer-list .answer.answered {
 	background: #46AB49;
 	color: #FFF;
+}
+
+#question-list {
+	border-spacing: 10px;
+	border-collapse: separate;
+}
+
+#question-list td{
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-right: 10px;
+}
+
+#question-list .answer {
+	text-align: center;
+	padding-left: 10px;
+}
+
+#question-list .answer[data-answered="0"] {
+	background: #EEE;
+}
+
+#question-list .answer[data-answered="0"] span {
+	opacity: 0;
+}
+
+#question-list .answer[data-answered="1"] {
+	background: #66ff66;
+}
+
+#question-list .answer[data-answered="1"] span {
+	opacity: 1;
+
 }
 
 .selected-answer { display: none; }

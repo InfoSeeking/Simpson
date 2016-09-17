@@ -67,11 +67,8 @@ class StudyCreate extends Command
         // Create answers for every user, all initially unanswered.
         $userArray = array_values($userMap);
         $answerArray = [];
-        printf("Creating answers for each user\n");
         foreach ($questions as $question) {
-            printf("Q:%s\n", $question['question']);
             foreach ($question["answers"] as $position => $answerText) {
-                printf(" A:%s\n", $answerText);
                 array_push($answerArray, ['position' => $position, 'question_id' => $question['id']]);
                 foreach ($userArray as $user) {
                     Answer::create([

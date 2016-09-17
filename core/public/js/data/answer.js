@@ -1,15 +1,6 @@
 var AnswerModel = Backbone.Model.extend({
 	initialize: function() {
 		this.on('error', this.onError, this);
-		this.recomputeAnswered();
-		this.on('change', this.recomputeAnswered, this);
-	},
-	recomputeAnswered: function() {
-		if (this.get('answered') === "1" || this.get('answered') === true || this.get('answered') === 1) {
-			this.set('isAnswered', true);
-		} else {
-			this.set('isAnswered', false);
-		}
 	},
 	onError: function(model, response) {
 		MessageDisplay.displayIfError(response.responseJSON);
@@ -21,6 +12,7 @@ var AnswerCollection = Backbone.Collection.extend({
 	url: '/api/v1/answers',
 	initialize: function() {
 		this.on('error', this.onError, this);
+		this.comparator = 'position';
 	},
 	parse: function(json){
 		return json.result;
