@@ -1,4 +1,5 @@
 <?php
+// DEPRECATED. DO NOT USE.
 
 namespace App\Console\Commands;
 
@@ -50,6 +51,8 @@ class DemoCreate extends Command
      */
     public function handle()
     {
+        printf("Command no longer supported\n");
+        return;
         $demoUser = User::where('email', 'simpson_demo@demo.demo')->first();
 
         $project = new Project();

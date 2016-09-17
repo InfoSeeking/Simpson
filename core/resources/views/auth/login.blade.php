@@ -27,10 +27,10 @@
             </button>
         </div>
     </form>
-    <p>Don't have an account yet? <a href='/auth/register'>Register here</a>.</p>
+    <!--<p>Don't have an account yet? <a href='/auth/register'>Register here</a>.</p>-->
 </div>
 <div class='col-sm-5'>
-    <p>Don't want to create an account?</p>
+    <!--<p>Don't want to create an account?</p>
     <form method="POST" action="/auth/demoLogin">
         <div class="form-group">
             <button class="btn btn-primary" type="submit">Continue as Demo User <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
@@ -39,6 +39,7 @@
         <input type='hidden' name='after_login_redirect' value='{{ Session::get("after_login_redirect") }}' />
         @endif
     </form>
+    -->
 </div>
 
 @endsection('main-content')

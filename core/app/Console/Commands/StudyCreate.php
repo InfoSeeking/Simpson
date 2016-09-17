@@ -46,49 +46,70 @@ class StudyCreate extends Command
     }
 
     private function createAnswers($project, $userMap, $json) {
-        // Create answers.
-        $numQuestions = $json['numberQuestions'];
-        $answersPerUser = $json['answersPerUser'];
+        // Create questions in database.
+        $questions = $json['questions'];
+        $numTotalAnswers = 0;
 
-        if ($answersPerUser * count($userMap) < $numQuestions)
-            exit("Not enough answers per user to give answers to every question\n");
-
-        $userArray = array_values($userMap);
-        $qIds = [];
-        for ($i = 1; $i <= $numQuestions; $i++) {
-            foreach ($userArray as $user) {
-                Answer::create([
-                    'name' => "" . $i,
-                    'project_id' => $project->id,
-                    'user_id' => $user->id,
-                    'answered' => false
-                    ]);
-            }
-            array_push($qIds, "" . $i);
+        foreach ($questions as &$question) {
+            $question['id'] = Question::create([
+                'text' => $question['question'],
+                'project_id' => $project->id,
+                'num_answers' => count($question['answers'])
+            ])->id;
+            $numTotalAnswers += count($question['answers']);
         }
 
-        shuffle($qIds);
-        for ($i = 0; $i < count($qIds); $i++) {
+        $answersPerUser = $json['answersPerUser'];
+        if ($answersPerUser * count($userMap) < $numTotalAnswers)
+            exit("Not enough answers per user to give answers to every question\n");
+
+        // Create answers for every user, all initially unanswered.
+        $userArray = array_values($userMap);
+        $answerArray = [];
+        printf("Creating answers for each user\n");
+        foreach ($questions as $question) {
+            printf("Q:%s\n", $question['question']);
+            foreach ($question["answers"] as $position => $answerText) {
+                printf(" A:%s\n", $answerText);
+                array_push($answerArray, ['position' => $position, 'question_id' => $question['id']]);
+                foreach ($userArray as $user) {
+                    Answer::create([
+                        'name' => $answerText,
+                        'project_id' => $project->id,
+                        'user_id' => $user->id,
+                        'answered' => 0,
+                        'position' => $position,
+                        'question_id' => $question['id']
+                        ]);
+                }
+            }
+        }
+
+        shuffle($answerArray);
+        $i = 0;
+        foreach($answerArray as $answerKey) {
             $user = $userArray[$i % count($userArray)];
             $answer = Answer::where('project_id', $project->id)
                 ->where('user_id', $user->id)
-                ->where('name', $qIds[$i])
+                ->where('position', $answerKey['position'])
+                ->where('question_id', $answerKey['question_id'])
                 ->first();
-            $answer->answered = true;
+            $answer->answered = 1;
             $answer->save();
+            $i++;
         }
 
-        // Now assign remaining allotted answers randomly per user.
 
+        // Now assign remaining allotted answers randomly per user.
         foreach ($userArray as $user) {
             // Get remaining unanswered questions.
-            $unanswered = Answer::where('project_id', $project->id)->where('user_id', $user->id)->where('answered', false)->get();
-            $numAnswered = $numQuestions - $unanswered->count();
+            $unanswered = Answer::where('project_id', $project->id)->where('user_id', $user->id)->where('answered', 0)->get();
+            $numAnswered = $numTotalAnswers - $unanswered->count();
             $numLeft = $answersPerUser - $numAnswered;
             $unanswered = $unanswered->shuffle();
             for ($i = 0; $i < $numLeft; $i++) {
                 $ans = $unanswered->offsetGet($i);
-                $ans->answered = true;
+                $ans->answered = 1;
                 $ans->save();
             }
         }
