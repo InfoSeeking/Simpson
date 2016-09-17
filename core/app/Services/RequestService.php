@@ -10,6 +10,7 @@ use App\Models\Request;
 use App\Models\Membership;
 use App\Models\User;
 use App\Services\AnswerService;
+use App\Services\QuestionService;
 use App\Services\MembershipService;
 use App\Services\ConnectionService;
 use App\Services\LogService;
@@ -27,7 +28,8 @@ class RequestService {
 		AnswerService $answerService,
 		ScoreService $scoreService,
 		ProjectService $projectService,
-		LogService $logService
+		LogService $logService,
+		QuestionService $questionService
 		) {
 		$this->memberService = $memberService;
 		$this->realtimeService = $realtimeService;
@@ -36,6 +38,7 @@ class RequestService {
 		$this->scoreService = $scoreService;
 		$this->projectService = $projectService;
 		$this->logService = $logService;
+		$this->questionService = $questionService;
 		$this->user = Auth::user();
 	}
 	
@@ -101,7 +104,7 @@ class RequestService {
 			'recipient_id' => 'sometimes|integer|exists:users,id',
 			'intermediary_id' => 'sometimes|integer|exists:users,id',
 			'project_id' => 'required|integer|exists:projects,id',
-			'answer_name' => 'sometimes|string|exists:answers,name',
+			'question_id' => 'sometimes|integer|exists:questions,id',
 			]);
 
 		if ($validator->fails()) {
@@ -132,9 +135,9 @@ class RequestService {
 		}
 
 		if ($request->type == 'answer' || $request->type == 'answer_all') {
-			$request->answer_id = $args['answer_name'];
+			$request->question_id = $args['question_id'];
 			// This gets an immediate response.
-			$wasAnswered = $this->answerService->handle($request);
+			$wasAnswered = $this->questionService->handle($request);
 			$request->state = $wasAnswered ? 'answered' : 'not_answered';
 		}
 

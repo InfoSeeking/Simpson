@@ -111,7 +111,7 @@ page-view
 					<% } else { %>
 					<select class='form-control' name='questions'>
 						<% for (var i = 0; i < questions.length; i++) { %>
-						<option value=<%= questions[i].id %>><%= questions[i].name %></option>
+						<option value=<%= questions[i].id %>><%= questions[i].text %></option>
 						<% } %>
 					</select>
 					<% } %>

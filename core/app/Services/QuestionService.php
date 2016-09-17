@@ -16,6 +16,7 @@ use App\Services\ConnectionService;
 use App\Services\LogService;
 use App\Utilities\Status;
 use App\Utilities\StatusCodes;
+use Illuminate\Support\Facades\Log;
 
 class QuestionService {
     public function __construct(
@@ -45,6 +46,64 @@ class QuestionService {
     }
     
     public function handle(Request $request) {
-        return false;
+        // Get other user's answers for this question.
+        $otherUserAnswers = Answer::where('question_id', $request->question_id)->where('answered', 1);
+        if ($request->type == 'answer') {
+            $otherUserAnswers->where('user_id', $request->recipient_id);
+        } else if ($request->type == 'answer_all') {
+            // Get id list of other users who we are connected to directly.
+            $otherIds = $this->connectionService->getOtherIds();
+            $otherUserAnswers->whereIn('user_id', $otherIds);
+        } else {
+            throw new \IllegalArgumentException('Invalid request type');
+        }
+        Log::info("After user id, otherUserAnswers.count=" . $otherUserAnswers->count());
+
+        
+        // Get the answers that this user needs for this question.
+        $answersNeeded = Answer::where('question_id', $request->question_id)
+            ->where('user_id', $this->user->id)
+            ->where('answered', 0);
+        Log::info("answersNeeded=" . $answersNeeded->count());
+        if ($answersNeeded->count() == 0) return false;
+
+        $answered = $answersNeeded->whereIn('position', $otherUserAnswers->get()->pluck('position'))->first();
+        if ($answered != null) {
+            $answered->answered = 1;
+            $answered->save();   
+        }
+
+        $this->logService
+                ->withUserId($this->user->id)
+                ->withProjectId($request->project_id)
+                ->withRequestId($request->id)
+                ->withAnswerId($answered == null ? 0 : $answered->id)
+                ->withKey($answered == null ? 'answer_unfulfilled' : 'answer_get')
+                ->withValue($request->question_id)
+                ->save();
+
+        $numUnanswered = Answer::where('user_id', $this->user->id)
+            ->where('project_id', $request->project_id)
+            ->where('answered', 0)
+            ->get()
+            ->count();
+
+        if ($numUnanswered == 0) {
+            // User finished.
+            $this->logService
+                ->withUserId($this->user->id)
+                ->withProjectId($request->project_id)
+                ->withRequestId($request->id)
+                ->withKey('finished')
+                ->save();
+        }
+        
+        if ($answered != null) {
+            $this->realtimeService
+                ->withModel($answered)
+                ->onProject($request->project_id)
+                ->emit('update');
+        }
+        return $answered != null;
     }
 }
