@@ -14,6 +14,7 @@ use App\Services\MembershipService;
 use App\Services\RealtimeService;
 use App\Services\ConnectionService;
 use App\Services\LogService;
+use App\Services\ProjectService;
 use App\Utilities\Status;
 use App\Utilities\StatusCodes;
 use Illuminate\Support\Facades\Log;
@@ -23,8 +24,10 @@ class QuestionService {
         MembershipService $memberService,
         RealtimeService $realtimeService,
         ConnectionService $connectionService,
-        LogService $logService
+        LogService $logService,
+        ProjectService $projectService
         ) {
+        $this->projectService = $projectService;
         $this->memberService = $memberService;
         $this->realtimeService = $realtimeService;
         $this->connectionService = $connectionService;
@@ -32,6 +35,23 @@ class QuestionService {
         $this->user = Auth::user();
     }
     
+    public function getTopics($userId, $projectId) {
+        // Get all existing answers.
+        $answers = Answer::where('user_id', $userId)->where('project_id', $projectId)->where('answered', 1)->get();
+        $topics = Question::whereIn('id', $answers->pluck('question_id'))->get()->pluck('topic')->toArray();
+        return array_unique($topics);
+    }
+
+    public function getAllUserTopics($projectId) {
+        $users = $this->projectService->getSharedUsers($projectId)->getResult()->pluck('user');
+        $userMap = [];
+        foreach ($users as $user) {
+            $uid = $user['id'];
+            $userMap[$uid] = $this->getTopics($uid, $projectId);
+        }
+        return $userMap;
+    }
+
     // Get all questions for this this project.
     public function getMultiple($args) {
         $validator = Validator::make($args, [
@@ -101,6 +121,12 @@ class QuestionService {
         if ($answered != null) {
             $this->realtimeService
                 ->withModel($answered)
+                ->onProject($request->project_id)
+                ->emit('update');
+
+            $newTopics = $this->getTopics($this->user->id, $request->project_id);
+            $this->realtimeService
+                ->withRawData($newTopics, 'topics')
                 ->onProject($request->project_id)
                 ->emit('update');
         }

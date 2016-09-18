@@ -145,7 +145,7 @@ var ConnectionGraphView = Backbone.View.extend({
 		userList.each(function(user) {
 			var userNode = {
 				id: user.get('id'),
-				label: user.get('name')
+				label: user.get('name') + ""
 			};
 			if (user.get('id') == Config.get('userId')) {
 				userNode.color = {
@@ -169,7 +169,7 @@ var ConnectionGraphView = Backbone.View.extend({
 		};
 
 		var options = {
-			height: '400px',
+			height: '350px',
 			nodes: {
 				shape: 'dot',
 				font: {
@@ -211,6 +211,13 @@ var ConnectionGraphView = Backbone.View.extend({
 	},
 	remove: function(model) {
 
+	},
+	setTopics: function(id, topics) {
+		var existingNode = this.nodes.get(id);
+		if (!existingNode) return;
+		var user = userList.get(id);
+		var topicsString = topics.join(", ");
+		this.nodes.update([{id: id, label: user.get('name') + ' - knows ' + topicsString}]);
 	}
 });
 
@@ -237,7 +244,7 @@ var CurrentSelectedView = Backbone.View.extend({
 			cost: getCost('connection', this.model.get('id')),
 			askcost: getCost('answer', this.model.get('id'))
 		};
-		this.$el.empty().html(this.template(data));
+		this.$el.empty().html(this.template(data)).show();
 	},
 	remove: function() {
 		this.$el.empty();

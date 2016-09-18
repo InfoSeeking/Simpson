@@ -38,12 +38,18 @@ page-view
 	<div class='scrollpane'>
 		<table class='table table-condensed table-hover' id='outgoing-request-list'></table>
 	</div>
+
+	<h4>Users Connected to You</h4>
+	<table class='table table-condensed table-hover' id='user-connection-list'></table>
+	<div id='ask-all-container' style='text-align: center; padding-bottom: 20px;'></div>
 </div>
 <div class='col-md-6'>
-	<p>You have <b id='user-score'>{{ $userScore }}</b> Network Capital (NC) Points, <b id='answer-score'>0</b> Answers collected, and are linked to  <b id='link-score'>0</b> other people</p>
-	<p>Your total score is <b id='total-score'>0</b>. Your rank is <b id='place'>{{ $place }}</b> of {{ count($sharedUsers) }}.</p>
-
-	<p>Time left: <b id='time-left'>{{ floor($timeLeft / 60) }}:{{ $timeLeft % 60}}</b></p>
+	<p style='display:none'>You have <b id='user-score'>{{ $userScore }}</b> Network Capital (NC) Points, <b id='answer-score'>0</b> Answers collected, and are linked to  <b id='link-score'>0</b> other people</p>
+	<div id='scores'>
+		<p><span class='title'>Your score:</span><span class='score' id='total-score'>0</span></p>
+		<p><span class='title'>Your position:</span><span class='score' id='place'>{{ $place }}</span> of {{ count($sharedUsers) }}</p>
+		<p><span class='title'>Time left:</span><span class='score' id='time-left'>{{ floor($timeLeft / 60) }}:{{ $timeLeft % 60}}</span></p>
+	</div>
 
 	<h4>Question List</h4>
 	<div id='answer-list'></div>
@@ -52,9 +58,7 @@ page-view
 
 	
 
-	<h4>Users Connected to You</h4>
-	<table class='table table-condensed table-hover' id='user-connection-list'></table>
-	<div id='ask-all-container' style='text-align: center; padding-bottom: 20px;'></div>
+	
 
 	<h4>Incoming Connection Requests</h4>
 	<div class='scrollpane'>
@@ -259,6 +263,17 @@ var answerList = new AnswerCollection({!! $answers->toJSON() !!});
 var questionList = new QuestionCollection({!! $questions->toJSON() !!});
 var questionListView = new QuestionListView({ collection: questionList });
 
+var showTopics = {!! $project->show_topics !!};
+
+if (showTopics) {
+	(function(initTopics) {
+		for (var uid in initTopics) {
+			if (!initTopics.hasOwnProperty(uid)) continue;
+			connectionGraphView.setTopics(uid, initTopics[uid]);
+		}
+	}({!! json_encode($topics) !!}));
+}
+
 answerList.on('change', onAnswerChange);
 onAnswerChange();
 
@@ -386,6 +401,10 @@ function realtimeDataHandler(param) {
 				updateTotalScore();
 			}
 		})
+	} else if (param.dataType == 'topics') {
+		if (showTopics) {
+			connectionGraphView.setTopics(param.userID, param.data);
+		}
 	}
 }
 

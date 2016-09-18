@@ -499,7 +499,8 @@ footer {
 }
 
 #question-list {
-	border-spacing: 10px;
+	border-spacing: 1px;
+	width: 100%;
 	border-collapse: separate;
 }
 
@@ -561,5 +562,30 @@ footer {
 #selected-user {
 	background: #EEE;
 	padding: 10px 10px 5px 10px;
+	display: none;
+}
 
+#scores {
+	display: flex;
+	width: 100%;
+}
+#scores p {
+	flex-grow: 1;
+	text-align: center;
+	margin: 0px;
+	background: #EEE;
+	padding: 5px 10px;
+}
+
+#scores p span.title {
+	display: inline-block;
+	padding-right: 5px;
+	/*width: px;*/
+}
+
+#scores p span.score {
+	font-weight: bold;
+	display: inline-block;
+	text-align: left;
+	/*width: 100px;*/
 }

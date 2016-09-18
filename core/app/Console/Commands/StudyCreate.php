@@ -47,6 +47,8 @@ class StudyCreate extends Command
     }
 
     private function createAnswers($project, $userMap, $json) {
+        $showTopics = array_key_exists('showTopics', $json) ? $json['showTopics'] : false;
+
         // Create questions in database.
         $questions = $json['questions'];
         $numTotalAnswers = 0;
@@ -55,7 +57,8 @@ class StudyCreate extends Command
             $questions[$index]['id'] = Question::create([
                 'text' => $question['question'],
                 'project_id' => $project->id,
-                'num_answers' => count($question['answers'])
+                'num_answers' => count($question['answers']),
+                'topic' => $showTopics ? $question['topic'] : null
             ])->id;
             $numTotalAnswers += count($question['answers']);
         }
@@ -122,6 +125,7 @@ class StudyCreate extends Command
             if (array_key_exists('scenarioName', $json)) $project->scenario_name = $json['scenarioName'];
             if (array_key_exists('timeout', $json)) $project->timeout = $json['timeout'];
             if (array_key_exists('description', $json)) $project->description = $json['description'];
+            if (array_key_exists('showTopics', $json)) $project->show_topics = $json['showTopics'];
 
             if ($prevScenario == null) {
                 // This is the first project.

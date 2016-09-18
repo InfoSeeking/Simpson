@@ -109,6 +109,8 @@ class WorkspaceController extends Controller
         $questionsStatus = $this->questionService->getMultiple(['project_id' => $projectId]);
         if (!$questionsStatus->isOK()) return $questionsStatus->asRedirect('workspace');
 
+        $topics = $this->questionService->getAllUserTopics($projectId);
+
         $timeLeft = $this->projectService->getTimeLeft($projectId);
         $numUnanswered = $this->answerService->getNumUnanswered($projectId);
         $project = $projectStatus->getResult();
@@ -128,7 +130,8 @@ class WorkspaceController extends Controller
             'answers' => $answersStatus->getResult(),
             'timeLeft' => $timeLeft,
             'place' => $this->scoreService->getPlace($projectId),
-            'questions' => $questionsStatus->getResult()
+            'questions' => $questionsStatus->getResult(),
+            'topics' => $topics
             ]);
     }
 

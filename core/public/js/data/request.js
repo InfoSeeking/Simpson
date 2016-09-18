@@ -77,6 +77,7 @@ var RequestListItemView = Backbone.View.extend({
 		if (this.model.get('state') != 'open') return;
 		var timeLeft = this.model.get('timeLeft');
 		timeLeft--;
+		timeLeft = Math.max(timeLeft, 0);
 		if (timeLeft <= 0 && this.model.get('direction') == 'incoming') {
 			// Auto reject on timeout for the recipient of the request.
 			this.onReject();
