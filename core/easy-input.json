@@ -12,7 +12,7 @@
 	"scenarios": [
 		{
 			"scenarioName": "A",
-			"description": "Use this description to provide pre-study instructions. This scenario is structured, low uncertainty",
+			"description": "This scenario is structured, low uncertainty. Connections are set, and topics are shown.",
 			"showTopics": true,
 			"connections": [
 				["1", "3"],
@@ -34,23 +34,63 @@
 					"question": "Name 3 programming languages",
 					"answers": ["C++", "Python", "Java"],
 					"topic": "Computers"
-				},
-				{
-					"question" : "What are the 3 biggest operating systems?",
-					"answers" : ["OSX", "Windows", "Linux"],
-					"topic": "Computers"
-				},
-				{
-					"question" : "What are the 3 most popular websites?",
-					"answers": ["Google", "Reddit", "Facebook"],
-					"topic": "Computers"
 				}
 			],
 			"answersPerUser": 3
 		},
 		{
 			"scenarioName": "B",
-			"description": "This scenario is non-structured, high uncertainty.",
+			"description": "This scenario is structured, high uncertainty. Connections are set, but topics are hidden",
+			"showTopics": false,
+			"connections": [
+				["1", "3"],
+				["4", "5"]
+			],
+			"timeout": 1800,
+			"questions": [
+				{
+					"question" : "Name 3 African mammals",
+					"answers" : ["Lion", "Cheetah", "Monkey"]
+				},
+				{
+					"question": "Name 3 brands of cars",
+					"answers": ["Lexus", "BMW", "Nissan"]
+				},
+				{
+					"question": "Name 3 programming languages",
+					"answers": ["C++", "Python", "Java"]
+				}
+			],
+			"answersPerUser": 3
+		},
+		{
+			"scenarioName": "C",
+			"description": "This scenario is non-structured, low uncertainty. Connections are not set, but topics are shown",
+			"showTopics": true,
+			"connections": [],
+			"timeout": 1800,
+			"questions": [
+				{
+					"question" : "Name 3 African mammals",
+					"answers" : ["Lion", "Cheetah", "Monkey"],
+					"topic": "Animals"
+				},
+				{
+					"question": "Name 3 brands of cars",
+					"answers": ["Lexus", "BMW", "Nissan"],
+					"topic": "Cars"
+				},
+				{
+					"question": "Name 3 programming languages",
+					"answers": ["C++", "Python", "Java"],
+					"topic": "Computers"
+				}
+			],
+			"answersPerUser": 3
+		},
+		{
+			"scenarioName": "D",
+			"description": "This scenario is non-structured, high uncertainty. No connections and topics are hidden.",
 			"showTopics": false,
 			"connections": [],
 			"timeout": 1800,
