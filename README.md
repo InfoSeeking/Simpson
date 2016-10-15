@@ -6,30 +6,34 @@ A social networking study platform.
 Running a Study
 ---------------
 ### Quickstart ###
-In this repo is an example study named represented by 'easy-input.json'. This has all available options for a SIMPSON study filled in.
-To create this example study, run
+In this repo is an example study named represented by 'easy-input.json'. This has all available options for a SIMPSON study filled in. It should be possible to model real studies from the format of this file.
 
+To create this example study, run
 ```
 cd core
 php artisan study:create --infile easy-input.json
 ```
 
-This creates a study named "StudyName". Check `easy-input.json.out` for the generated user emails and log in as a user. Notice, the study has not yet started, so the user will not be able to proceed until the first scenario is started.
+This creates a study named "StudyName" with four scenarios. Check `easy-input.json.out` for the generated user emails and log in as a user. Notice, the study has not yet started, so the user will not be shown the button to continue until the first scenario is started.
 
-To start the first scenario, run
+To see the status of all scenarios, run:
 ```
-php artisan study:advance --name "StudyName"
-```
-This will start the first scenario and kick off the scenario timer. To see the status of the project scenarios, run
-```
-php artisan study:advance --name "StudyName"
+php artisan study:info --name "StudyName"
 ```
 
-To end this scenario (regardless of how much time is left), use the advance command again.
+This lists all of the scenarios of the project and their respective states. The first scenario is in\_queue. To start it, run:
 ```
 php artisan study:advance --name "StudyName"
 ```
-This will end the first scenario and queue up the next. This time can be used to give the users a short break in between. To start the next scenario, use the advance command again. Continue to do so until the study is over.
+
+Note, advancing the scenarios is not currently possible to undo. If you run `study:info` again, you'll see that the first scenario has started while the second is now in\_queue.
+
+Running `study:advance` again will end the first scenario. The second scenario will stay in queue, this time can be used to give the users a short break in between scenarios. To start the next scenario, use the `study:advance` command again. Continue in fashion until the study is over.
+
+To delete this study, run:
+```
+php artisan study:destroy --name "StudyName"
+```
 
 ### Command Reference ###
 To see all available artisan commands run the following
