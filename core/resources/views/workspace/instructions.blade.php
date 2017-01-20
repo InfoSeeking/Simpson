@@ -52,7 +52,12 @@ Each of you have 20 questions to answer and you all start off with about 4 rando
 @if ($project->active && $project->state == 'started')
 <a class='btn btn-primary' href='/workspace/projects/{{$project->id}}'>Continue to Study &raquo;</a>
 @else
-<p>The study is not currently active, please refresh the page at the time this study starts.</p>
+<p>The study is not currently active. This page will automatically refresh every 60 seconds until the study becomes active.</p>
+<script>
+window.setTimeout(function(){
+    window.location.reload();
+}, 60000);
+</script>
 
 <p>You can return to these instructions at any time by clicking the <i>INSTRUCTIONS</i> link at the top of the page.</p>
 

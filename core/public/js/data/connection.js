@@ -216,7 +216,8 @@ var ConnectionGraphView = Backbone.View.extend({
 		var existingNode = this.nodes.get(id);
 		if (!existingNode) return;
 		var user = userList.get(id);
-		var topicsString = topics.join(", ");
+		// Limit the number of topics displayed to 3.
+		var topicsString = topics.slice(0,3).join(", ");
 		this.nodes.update([{id: id, label: user.get('name') + ' - knows ' + topicsString}]);
 	}
 });

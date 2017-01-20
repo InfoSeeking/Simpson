@@ -92,6 +92,55 @@ php artisan study:activate --name "StudyName"
 php artisan study:deactivate --name "StudyName"
 ```
 
+Database
+--------
+It is worth noting that because of older terminology, a "project" in the database really means a scenario.
+
+All tables have a `created_at` and `updated_at` field. The `created_at` field is particularly useful as it is the time the record was inserted.
+
+The following is a list of tables with a description.
+- <b>answers</b> has an entry for each user and each answer regardless of whether the answer was obtained. The boolean `answered` field indicates if the user obtained that answer. There is a many-to-one relationship with the <b>answers</b> table and the <b>questions</b> table.
+- <b>connections</b> records who initiated the connection, if there was an intermediary, and who was the recipient. `intermediary_id` is null if no intermediary was used. The `created_at` field can be used to determine when the connection was made.
+- <b>logs</b> is a dumping ground for log data, including score changes, when answers were recieved, and if/when the user finished answering all questions. It simply stores a key/value pair and other context data. Here is a list of all possible values of 'key':
+    - <b>finished</b> indicates the user obtained the last answer (will not necessarily happen)
+    - <b>score_change</b> indicates the amount when a score of the user is changed in any way
+    - <b>answer_get</b> indicates the user obtained an answer from another user
+    - <b>answer_unfulfilled</b> indicates the user asked but did not get an answer from another user
+    - <b>login</b> indicates when the user logged in
+- <b>memberships</b> maps users to scenarios (note, scenario == project)
+- <b>migrations</b> and <b>password_resets</b> are Laravel specific tables
+- <b>projects</b> contains all scenarios. The `nextProject` and `prevProject` fields indicate the ordering.
+- <b>requests</b> contains rows for each time a user sends a request for a connection or answer.
+- <b>scores</b> contains scores for each user <i>for each scenario</i>. To get the accumulated score of a user over all of the scenarios, you need to sum all their scores for each scenario.
+- <b>users</b> contains a record for each user
+
+
+To view the exact schema, use the `describe` command in MySQL, e.g. `describe answers` should give
+```
++-------------+------------------+------+-----+---------------------+----------------+
+| Field       | Type             | Null | Key | Default             | Extra          |
++-------------+------------------+------+-----+---------------------+----------------+
+| id          | int(10) unsigned | NO   | PRI | NULL                | auto_increment |
+| user_id     | int(10) unsigned | NO   |     | NULL                |                |
+| name        | varchar(255)     | NO   |     | NULL                |                |
+| created_at  | timestamp        | NO   |     | 0000-00-00 00:00:00 |                |
+| updated_at  | timestamp        | NO   |     | 0000-00-00 00:00:00 |                |
+| deleted_at  | timestamp        | YES  |     | NULL                |                |
+| project_id  | int(10) unsigned | NO   |     | NULL                |                |
+| answered    | int(10) unsigned | NO   |     | 0                   |                |
+| question_id | int(10) unsigned | NO   |     | NULL                |                |
+| position    | int(10) unsigned | NO   |     | NULL                |                |
++-------------+------------------+------+-----+---------------------+----------------+
+```
+
+To get a CSV backup, use the `mysqldump` command as follows:
+
+```
+mysqldump -u<username> -p --tab=<dump directory> simpson
+```
+
+This will output two files per table, one .sql file and one .txt tab separated file.
+
 Tips
 ----
 

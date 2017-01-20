@@ -266,9 +266,20 @@ class WorkspaceController extends Controller
             }
         }
 
+        $place = -1;
+        $numUsers = -1;
+        if ($nextProject) {
+            $place = $this->scoreService->getPlace($nextProject->id);
+            $sharedUsersStatus = $this->projectService->getSharedUsers($nextProject->id);
+            if (!$sharedUsersStatus->isOK()) return $sharedUsersStatus->asRedirect('workspace');
+            $numUsers = count($sharedUsersStatus->getResult());
+        }
+
         return view('workspace.end', [
             'user' => Auth::user(),
-            'project' => $nextProject
+            'project' => $nextProject,
+            'place' => $place,
+            'numUsers' => $numUsers
             ]);   
     }
 
